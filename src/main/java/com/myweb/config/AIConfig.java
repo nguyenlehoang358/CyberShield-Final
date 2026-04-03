@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import com.myweb.service.SystemSettingService;
 
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 
 /**
@@ -70,9 +68,10 @@ public class AIConfig {
      * - Converting user questions to vectors
      * - Converting LAB documents to vectors for similarity search
      */
-    @Bean
-    public EmbeddingModel embeddingModel() {
-        log.info("📐 Initializing local embedding model: all-MiniLM-L6-v2 (384 dimensions)");
-        return new AllMiniLmL6V2EmbeddingModel();
-    }
+    // @Bean
+    // public EmbeddingModel embeddingModel() {
+    // log.info("📐 Initializing local embedding model: all-MiniLM-L6-v2 (384
+    // dimensions)");
+    // return new AllMiniLmL6V2EmbeddingModel();
+    // }
 }
