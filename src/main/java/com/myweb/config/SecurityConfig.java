@@ -77,7 +77,8 @@ public class SecurityConfig {
                                                                                 "font-src 'self' data: https://fonts.gstatic.com; "
                                                                                 +
                                                                                 "img-src 'self' data: blob: https:; " +
-                                                                                "connect-src 'self' http://localhost:5173 https://generativelanguage.googleapis.com https://accounts.google.com https://github.com https://facebook.com; "
+                                                                                // THÊM URL VERCEL VÀO CSP
+                                                                                "connect-src 'self' http://localhost:5173 https://cybershield-final-chi.vercel.app https://generativelanguage.googleapis.com https://accounts.google.com https://github.com https://facebook.com; "
                                                                                 +
                                                                                 "frame-ancestors 'none'; " +
                                                                                 "form-action 'self' https://accounts.google.com https://github.com https://facebook.com; "
@@ -86,6 +87,8 @@ public class SecurityConfig {
                                 .cors(c -> c.configurationSource(corsConfigurationSource()))
                                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(auth -> auth
+                                                // CHO PHÉP ENDPOINT HEALTH
+                                                .requestMatchers("/api/v1/health").permitAll()
                                                 .requestMatchers("/", "/index.html", "/login.html", "/dashboard.html",
                                                                 "/css/**", "/js/**", "/images/**", "/oauth2/**",
                                                                 "/login/**", "/error", "/static/**", "/assets/**",
@@ -149,11 +152,16 @@ public class SecurityConfig {
         @Bean
         CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration config = new CorsConfiguration();
-                // Since we use allowCredentials(true), we cannot use setAllowedOrigins("*").
-                // However, setAllowedOriginPatterns supports using wildcards with credentials.
-                config.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173", "http://192.168.*.*:5173",
-                                "http://127.0.0.1:5173", "https://*.ngrok-free.app", "https://*.ngrok-free.dev",
-                                "https://tyler-nonexemplary-attractionally.ngrok-free.dev"));
+                // THÊM URL CỦA FRONTEND TRÊN VERCEL VÀO ĐÂY
+                config.setAllowedOriginPatterns(Arrays.asList(
+                                "http://localhost:5173",
+                                "http://192.168.*.*:5173",
+                                "http://127.0.0.1:5173",
+                                "https://*.ngrok-free.app",
+                                "https://*.ngrok-free.dev",
+                                "https://tyler-nonexemplary-attractionally.ngrok-free.dev",
+                                "https://cybershield-final-chi.vercel.app" // <- URL mới thêm
+                ));
                 config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
                 config.setAllowedHeaders(List.of("*"));
                 config.setAllowCredentials(true);
