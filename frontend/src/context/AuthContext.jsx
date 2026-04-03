@@ -5,21 +5,26 @@ import axios from 'axios'
 const AuthContext = createContext()
 
 // Lấy IP động để hỗ trợ truy cập mạng LAN từ điện thoại
-const currentHost = window.location.hostname
-// Ưu tiên lấy từ biến môi trường (Cho Production trên Vercel/Render)
-let apiBaseURL = import.meta.env.VITE_API_BASE_URL || ""
+const currentHost = window.location.hostname;
+// Dùng try-catch phòng hờ lỗi truy cập biến môi trường trên Production
+let apiBaseURL = "";
+try {
+    apiBaseURL = import.meta.env.VITE_API_BASE_URL || "";
+} catch (e) {
+    console.error("Lỗi nạp biến môi trường:", e);
+}
 
-// Logic cho môi trường phát triển (Local / LAN / Ngrok)
 if (!apiBaseURL) {
     if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-        apiBaseURL = '/api' // Dùng Vite Proxy
-    } else if (currentHost.includes('ngrok-free.app') || currentHost.includes('ngrok-free.dev')) {
-        apiBaseURL = import.meta.env.VITE_NGROK_BACKEND_URL || `https://api-${currentHost}/api`
+        apiBaseURL = '/api';
+    } else if (currentHost.includes('ngrok-free.app')) {
+        apiBaseURL = import.meta.env.VITE_NGROK_BACKEND_URL || "";
     } else {
-        // Mặc định cho LAN access (VD: http://192.168.x.x:5173 -> trỏ về cổng backend 8443)
-        apiBaseURL = `https://${currentHost}:8443/api`
+        // Fallback mặc định
+        apiBaseURL = `https://${currentHost}:8443/api`;
     }
 }
+console.log("🚀 API Base URL đang được sử dụng:", apiBaseURL);
 
 // Axios instance
 const api = axios.create({
@@ -99,7 +104,8 @@ export function AuthProvider({ children }) {
         }
         localStorage.removeItem('token') // Keep cleaning up any old state just in case
         setUser(null)
-        window.location.href = '/login'
+        // Dùng trang chủ hoặc đường dẫn gốc của app để tránh lỗi 404 ảo của SPA trên Vercel
+        window.location.assign('/')
     }
 
     const forgotPassword = async (email) => {

@@ -105,9 +105,13 @@ public class AuthController {
             }
 
             // 4. Login success → reset counters
-            bruteForceService.recordSuccess(clientIp, email);
-            loginAttemptService.logSuccess(clientIp, email, userAgent);
-            log.info("✅ Login success: {} from IP {}", email, clientIp);
+            try {
+                bruteForceService.recordSuccess(clientIp, email);
+                loginAttemptService.logSuccess(clientIp, email, userAgent);
+                log.info("✅ Login success: {} from IP {}", email, clientIp);
+            } catch (Exception logEx) {
+                log.error("⚠️ Failed to log success: {}", logEx.getMessage());
+            }
 
             return ResponseEntity.ok(response);
 
