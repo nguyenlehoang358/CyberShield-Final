@@ -128,8 +128,6 @@ app:
       timeout-seconds: 300
       temperature: 0.1
       max-tokens: 800
-    gemini:
-      api-key: ${GEMINI_API_KEY}
     # System prompt for the LAB AI Assistant (RAG-enhanced)
     system-prompt: |
       Bạn là CyberShield Security Assistant (Trợ lý AI Bảo Mật Mạng). Nhiệm vụ:
