@@ -160,6 +160,7 @@ public class SecurityConfig {
                                 "https://*.ngrok-free.dev",
                                 "https://tyler-nonexemplary-attractionally.ngrok-free.dev",
                                 "https://cybershield-prod.vercel.app",
+                                "https://cybershield-prod.vercel.app/",
                                 "https://cybershield-final-chi.vercel.app"));
                 config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
                 config.setAllowedHeaders(List.of("*"));
