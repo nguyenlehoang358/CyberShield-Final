@@ -33,22 +33,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         @Override
-        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+        protected void doFilterInternal(
+                        HttpServletRequest request,
+                        HttpServletResponse response,
                         FilterChain filterChain) throws ServletException, IOException {
-                
-                // 🚀 FIX QUAN TRỌNG: LUÔN CHO PHÉP REQUEST "OPTIONS" ĐI QUA NGAY LẬP TỨC 🚀
+
+                // FIX: Bỏ qua hoàn toàn OPTIONS preflight request
+                // Browser gửi OPTIONS trước khi gửi POST thật để kiểm tra CORS
+                // Filter này không được chặn hoặc xử lý JWT ở bước này
                 if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
                         response.setStatus(HttpServletResponse.SC_OK);
-                        return; // Ngừng filter tại đây, trả về 200 OK cho preflight
+                        filterChain.doFilter(request, response);
+                        return;
                 }
 
                 try {
                         String token = getTokenFromRequest(request);
+
                         if (StringUtils.hasText(token)) {
                                 Claims claims = jwtUtil.parseToken(token);
                                 String username = claims.getSubject();
 
-                                // Extract roles from claims directly
+                                // Extract roles từ claims
                                 String roles = (String) claims.get("roles");
 
                                 var authorities = roles != null
@@ -63,13 +69,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                 SecurityContextHolder.getContext().setAuthentication(auth);
                         }
                 } catch (Exception e) {
+                        // Log lỗi nhưng không block request — để Spring Security tự quyết định
                         LOGGER.error("Cannot set user authentication: {}", e.getMessage());
                 }
+
                 filterChain.doFilter(request, response);
         }
 
         private String getTokenFromRequest(HttpServletRequest request) {
-                // 1. Check Cookie first (Mandatory)
+                // 1. Ưu tiên đọc từ Cookie (httpOnly, secure hơn)
                 if (request.getCookies() != null) {
                         for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
                                 if ("jwt".equals(cookie.getName())) {
@@ -78,7 +86,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         }
                 }
 
-                // 2. Check Authorization header (Fallback)
+                // 2. Fallback: đọc từ Authorization header
                 String header = request.getHeader("Authorization");
                 if (header != null && header.startsWith("Bearer ")) {
                         return header.substring(7);
