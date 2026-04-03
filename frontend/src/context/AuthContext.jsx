@@ -6,15 +6,19 @@ const AuthContext = createContext()
 
 // Lấy IP động để hỗ trợ truy cập mạng LAN từ điện thoại
 const currentHost = window.location.hostname
-let apiBaseURL = `https://${currentHost}:8443/api`
+// Ưu tiên lấy từ biến môi trường (Cho Production trên Vercel/Render)
+let apiBaseURL = import.meta.env.VITE_API_BASE_URL || ""
 
-// Nếu là localhost, dùng đường dẫn tương đối để qua Vite Proxy (giúp bỏ qua lỗi SSL self-signed)
-if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-    apiBaseURL = '/api'
-}
-// Nếu truy cập từ ngrok (Internet)
-else if (currentHost.includes('ngrok-free.app') || currentHost.includes('ngrok-free.dev')) {
-    apiBaseURL = import.meta.env.VITE_NGROK_BACKEND_URL || `https://api-${currentHost}/api`
+// Logic cho môi trường phát triển (Local / LAN / Ngrok)
+if (!apiBaseURL) {
+    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+        apiBaseURL = '/api' // Dùng Vite Proxy
+    } else if (currentHost.includes('ngrok-free.app') || currentHost.includes('ngrok-free.dev')) {
+        apiBaseURL = import.meta.env.VITE_NGROK_BACKEND_URL || `https://api-${currentHost}/api`
+    } else {
+        // Mặc định cho LAN access (VD: http://192.168.x.x:5173 -> trỏ về cổng backend 8443)
+        apiBaseURL = `https://${currentHost}:8443/api`
+    }
 }
 
 // Axios instance
