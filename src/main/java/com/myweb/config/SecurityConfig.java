@@ -77,8 +77,7 @@ public class SecurityConfig {
                                                                                 "font-src 'self' data: https://fonts.gstatic.com; "
                                                                                 +
                                                                                 "img-src 'self' data: blob: https:; " +
-                                                                                // THÊM URL VERCEL VÀO CSP
-                                                                                "connect-src 'self' http://localhost:5173 https://cybershield-final-chi.vercel.app https://generativelanguage.googleapis.com https://accounts.google.com https://github.com https://facebook.com; "
+                                                                                "connect-src 'self' http://localhost:5173 https://cybershield-prod.vercel.app https://cybershield-final-chi.vercel.app https://generativelanguage.googleapis.com https://accounts.google.com https://github.com https://facebook.com; "
                                                                                 +
                                                                                 "frame-ancestors 'none'; " +
                                                                                 "form-action 'self' https://accounts.google.com https://github.com https://facebook.com; "
@@ -87,7 +86,6 @@ public class SecurityConfig {
                                 .cors(c -> c.configurationSource(corsConfigurationSource()))
                                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(auth -> auth
-                                                // CHO PHÉP ENDPOINT HEALTH
                                                 .requestMatchers("/api/v1/health").permitAll()
                                                 .requestMatchers("/", "/index.html", "/login.html", "/dashboard.html",
                                                                 "/css/**", "/js/**", "/images/**", "/oauth2/**",
@@ -99,7 +97,8 @@ public class SecurityConfig {
                                                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html",
                                                                 "/v3/api-docs/**", "/v3/api-docs")
                                                 .permitAll()
-                                                .requestMatchers("/api/auth/**").permitAll()
+                                                .requestMatchers("/api/auth/**").permitAll() // ĐẢM BẢO ENDPOINT ĐĂNG
+                                                                                             // NHẬP NỘI BỘ ĐƯỢC PHÉP
                                                 .requestMatchers("/api/public/**").permitAll()
                                                 .requestMatchers(org.springframework.http.HttpMethod.POST,
                                                                 "/api/contact")
@@ -116,11 +115,12 @@ public class SecurityConfig {
                                                                 .baseUri("/oauth2/authorization")
                                                                 .authorizationRequestRepository(
                                                                                 cookieAuthorizationRequestRepository))
-                                                // .redirectionEndpoint(redirection -> redirection
-                                                // .baseUri("/oauth2/callback/*"))
                                                 .userInfoEndpoint(userInfo -> userInfo
                                                                 .userService(customOAuth2UserService))
-                                                .successHandler(oAuth2LoginSuccessHandler))
+                                                .successHandler(oAuth2LoginSuccessHandler)
+                                                // NẾU OAUTH2 LỖI, ĐIỀU HƯỚNG VỀ TRANG LOGIN VỚI THÔNG BÁO LỖI (Tránh
+                                                // sập hệ thống xác thực)
+                                                .failureUrl("/login.html?error=oauth2_failed"))
                                 .exceptionHandling(ex -> ex
                                                 .accessDeniedHandler(this::handleAccessDenied)
                                                 .authenticationEntryPoint(this::handleUnauthorized))
@@ -152,7 +152,6 @@ public class SecurityConfig {
         @Bean
         CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration config = new CorsConfiguration();
-                // THÊM URL CỦA FRONTEND TRÊN VERCEL VÀO ĐÂY
                 config.setAllowedOriginPatterns(Arrays.asList(
                                 "http://localhost:5173",
                                 "http://192.168.*.*:5173",
@@ -160,8 +159,8 @@ public class SecurityConfig {
                                 "https://*.ngrok-free.app",
                                 "https://*.ngrok-free.dev",
                                 "https://tyler-nonexemplary-attractionally.ngrok-free.dev",
-                                "https://cybershield-prod.vercel.app/" // <- URL mới thêm
-                ));
+                                "https://cybershield-prod.vercel.app",
+                                "https://cybershield-final-chi.vercel.app"));
                 config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
                 config.setAllowedHeaders(List.of("*"));
                 config.setAllowCredentials(true);
