@@ -1,0 +1,317 @@
+
+/* Contact Page Styles */
+
+/* =========================================
+   Utility Classes (Emulating Tailwind)
+   ========================================= */
+  .text-center { text-align: center; }
+  .mx-auto { margin-left: auto; margin-right: auto; }
+  .mb-2 { margin-bottom: 0.5rem; }
+  .mb-4 { margin-bottom: 1rem; }
+  .mb-6 { margin-bottom: 1.5rem; }
+  .mb-8 { margin-bottom: 2rem; }
+  .mb-10 { margin-bottom: 2.5rem; }
+  .mb-16 { margin-bottom: 4rem; }
+  .text-primary { color: var(--text-primary, #1a1a2e); }
+  .text-secondary { color: var(--text-secondary, #6b7280); }
+  .text-accent { color: var(--accent, #667eea); }
+  .py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+  .py-20 { padding-top: 5rem; padding-bottom: 5rem; }
+  .relative { position: relative; }
+  .overflow-hidden { overflow: hidden; }
+  .z-10 { z-index: 10; }
+  .bg-white { background-color: white; }
+  .border-b { border-bottom-width: 1px; }
+  .border-border-light { border-color: rgba(0,0,0,0.1); }
+  .max-w-2xl { max-width: 42rem; }
+  .max-w-3xl { max-width: 48rem; }
+  .font-bold { font-weight: 700; }
+  .text-lg { font-size: 1.125rem; }
+  .flex { display: flex; }
+  .items-center { align-items: center; }
+  .items-start { align-items: flex-start; }
+  .gap-4 { gap: 1rem; }
+  .gap-2 { gap: 0.5rem; }
+  .rounded-lg { border-radius: 0.5rem; }
+  .p-3 { padding: 0.75rem; }
+  .justify-center { justify-content: center; }
+  .flex-wrap { flex-wrap: wrap; }
+  
+  /* Additional utilities for Contact page */
+  .grid { display: grid; }
+  .md\:grid-cols-2 { grid-template-columns: repeat(1, 1fr); }
+  .md\:grid-cols-3 { grid-template-columns: repeat(1, 1fr); }
+  .gap-6 { gap: 1.5rem; }
+  .gap-8 { gap: 2rem; }
+  .gap-16 { gap: 4rem; }
+  .space-y-6 > * + * { margin-top: 1.5rem; }
+  .w-full { width: 100%; }
+  
+  @media (min-width: 768px) {
+      .md\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+      .md\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+  }
+  
+  /* =========================================
+     Contact Page Specific Styles
+     ========================================= */
+  
+  .contact-page {
+      padding-bottom: 4rem;
+      animation: fadeIn 0.8s ease-in-out;
+  }
+  
+  .contact-hero {
+      position: relative;
+      background: var(--bg-dark-section);
+      color: white;
+      padding: 6rem 0 4rem;
+  }
+
+  .hero-title {
+      font-size: 3rem;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: white; 
+  }
+  
+  @media (min-width: 768px) {
+      .hero-title {
+          font-size: 4.5rem;
+      }
+  }
+
+  .hero-subtitle {
+      font-size: 1.125rem;
+      color: rgba(255, 255, 255, 0.8);
+      max-width: 42rem;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 2.5rem;
+  }
+  
+  .contact-bg-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(102, 126, 234, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+  }
+  
+  /* Contact Info Cards */
+  .contact-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.05);
+  }
+  
+  .contact-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .contact-icon {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+  }
+  
+  .contact-card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+  }
+  
+  .contact-card-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+  }
+  
+  .contact-link {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.2s;
+  }
+  
+  .contact-link:hover {
+      color: var(--accent-hover);
+      text-decoration: underline;
+  }
+  
+  /* Form Styling */
+  .contact-form-wrapper {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); */
+  }
+
+  .form-group {
+      margin-bottom: 1.5rem;
+  }
+  
+  .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+  }
+  
+  .form-input,
+  .form-select,
+  .form-textarea {
+      display: block;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--text-primary);
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #d1d5db;
+      border-radius: 0.5rem;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+  
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus {
+      border-color: var(--accent);
+      outline: 0;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+  
+  .form-textarea {
+      resize: vertical;
+      min-height: 120px;
+  }
+  
+  .submit-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.875rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);
+  }
+  
+  .submit-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 8px rgba(102, 126, 234, 0.35);
+  }
+  
+  .submit-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+  }
+  
+  /* Sidebar Styling (Redesigned) */
+  .contact-sidebar {
+      height: 100%;
+  }
+
+  .faq-card {
+      background: linear-gradient(145deg, #ffffff, #f3f4f6);
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      height: fit-content;
+  }
+  
+  .faq-bg-decoration {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 15rem;
+      height: 15rem;
+      background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+      transform: translate(30%, -30%);
+      z-index: 0;
+  }
+  
+  .faq-item {
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  
+  .faq-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+  }
+
+  .faq-question {
+      font-weight: 700;
+      color: var(--text-primary); /* Dark text */
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+  }
+
+  .faq-answer {
+      font-size: 0.9rem;
+      color: var(--text-secondary); /* Gray text */
+      line-height: 1.5;
+  }
+  
+  /* Misc */
+  .text-white { color: white; }
+  .text-gray-300 { color: #d1d5db; }
+  .font-bold { font-weight: 700; }
+  .font-semibold { font-weight: 600; }
+  .text-xl { font-size: 1.25rem; }
+  .text-sm { font-size: 0.875rem; }
+  .text-border-light { border-color: rgba(0,0,0,0.1); }
+
+  /* Dark Mode Overrides */
+  [data-theme="dark"] .contact-card,
+  [data-theme="dark"] .contact-form-wrapper,
+  [data-theme="dark"] .faq-card {
+      background-color: var(--bg-card);
+      border-color: var(--border);
+  }
+
+  [data-theme="dark"] .faq-card {
+      background: var(--bg-card);
+  }
+
+  [data-theme="dark"] .form-input,
+  [data-theme="dark"] .form-select,
+  [data-theme="dark"] .form-textarea {
+      background-color: var(--bg-primary);
+      border-color: var(--border);
+      color: var(--text-primary);
+  }
+
+  [data-theme="dark"] .form-input:focus,
+  [data-theme="dark"] .form-select:focus,
+  [data-theme="dark"] .form-textarea:focus {
+      background-color: var(--bg-card-hover);
+  }

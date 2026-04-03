@@ -1,0 +1,193 @@
+spring:
+  application:
+    name: myweb
+    # --- THÊM PHẦN NÀY ĐỂ FIX LỖI PATH PATTERN ---
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  # ---------------------------------------------
+  datasource:
+    url: jdbc:postgresql://ep-spring-pond-a1d5obpb-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+    username: neondb_owner
+    password: npg_RU5EKVvAhqY3
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 3
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+
+
+  # ═══ Redis Configuration ═══
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 5
+          min-idle: 2
+
+  # ═══ Mail (Admin Alerts) ═══
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: email,profile
+          facebook:
+            client-id: ${FACEBOOK_CLIENT_ID}
+            client-secret: ${FACEBOOK_CLIENT_SECRET}
+            scope: email,public_profile
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+            scope: user:email
+          linkedin:
+            client-id: ${LINKEDIN_CLIENT_ID:YOUR_LINKEDIN_CLIENT_ID}
+            client-secret: ${LINKEDIN_CLIENT_SECRET:YOUR_LINKEDIN_CLIENT_SECRET}
+            scope: openid,profile,email
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-name: LinkedIn
+        provider:
+          linkedin:
+            authorization-uri: https://www.linkedin.com/oauth/v2/authorization
+            token-uri: https://www.linkedin.com/oauth/v2/accessToken
+            user-info-uri: https://api.linkedin.com/v2/userinfo
+            jwk-set-uri: https://www.linkedin.com/oauth/openid/jwks
+            user-name-attribute: sub
+
+server:
+  address: 0.0.0.0
+  port: 8443
+  ssl:
+    enabled: ${SSL_ENABLED:true}
+    key-store: classpath:keystore.p12
+    key-store-password: ${SSL_KEYSTORE_PASSWORD:password}
+    key-store-type: PKCS12
+    key-alias: myweb
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+  endpoint:
+    health:
+      show-details: always
+
+# JWT
+jwt:
+  secret: ${JWT_SECRET:myweb-secret-key-min-256-bits-for-hs256-encoding-please-change-in-production}
+  expiration-ms: 86400000
+
+# ═══════════════════════════════════════════════
+# App Custom Properties
+# ═══════════════════════════════════════════════
+app:
+  security:
+    encryption:
+      key: ${APP_ENCRYPTION_KEY:12345678901234567890123456789012}
+
+  # ═══ AI / LLM Configuration ═══
+  ai:
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://127.0.0.1:11434}
+      model: ${OLLAMA_MODEL:qwen2.5:0.5b}
+      embedding-model: ${OLLAMA_EMBEDDING_MODEL:all-minilm}
+      timeout-seconds: 300
+      temperature: 0.1
+      max-tokens: 800
+    gemini:
+      api-key: ${GEMINI_API_KEY}
+    # System prompt for the LAB AI Assistant (RAG-enhanced)
+    system-prompt: |
+      Bạn là CyberShield Security Assistant (Trợ lý AI Bảo Mật Mạng). Nhiệm vụ:
+      - Trả lời câu hỏi về thiết bị, phần mềm, quy trình trong phòng LAB
+      - Hướng dẫn bảo mật cho người dùng (ví dụ: mẹo bảo mật mật khẩu, an toàn dữ liệu)
+      - Phân tích log bảo mật và Payload độc hại giúp Admin
+      - Hướng dẫn sử dụng các công cụ bảo mật (Wireshark, Nmap, Metasploit, Burp Suite...)
+
+      QUY TẮC QUAN TRỌNG:
+      1. Nếu có "Tài liệu tham khảo" bên dưới, HÃY ƯU TIÊN sử dụng thông tin đó để trả lời
+      2. Trích dẫn nguồn khi sử dụng thông tin từ tài liệu
+      3. Trả lời bằng tiếng Việt, ngắn gọn, chuyên môn, cấu trúc rõ ràng.
+      5. Nếu không biết hoặc không có thông tin, nói rõ ràng
+      6. KHÔNG bịa đặt thông tin về thiết bị hoặc quy trình LAB
+
+  # ═══ Brute Force Protection Config ═══
+  bruteforce:
+    max-attempts: 5
+    captcha-threshold: 3
+    lock-duration-minutes: 1
+    escalation-multiplier: 5
+    permanent-block-threshold: 50
+    whitelist-ips: ${BF_WHITELIST:192.168.1.99} # Cứ cho 1 cái IP vớ vẩn nào đó vào đây
+    # whitelist-ips: ${BF_WHITELIST:127.0.0.1,0:0:0:0:0:0:0:1}
+
+  # ═══ pgvector Configuration ═══
+  vector:
+    dimension: 384
+    similarity-threshold: 0.7
+    max-results: 5
+
+# ═══════════════════════════════════════════════
+# CyberShield System Settings Defaults
+# Khi database chưa có Settings, hệ thống sẽ
+# đọc các giá trị bên dưới để khởi tạo (Seed).
+# ═══════════════════════════════════════════════
+cybershield:
+  defaults:
+    # ── Tab 1: General System ──
+    general:
+      maintenance-mode: false
+      log-level: ALL
+      default-lang: vi
+
+    # ── Tab 2: Defense Firewall ──
+    defense:
+      auto-ban-threshold: ${app.bruteforce.max-attempts:5}
+      block-duration-minutes: ${app.bruteforce.lock-duration-minutes:1}
+      ip-whitelist: ${app.bruteforce.whitelist-ips:127.0.0.1}
+
+    # ── Tab 3: AI & Automation ──
+    ai:
+      sensitivity: MEDIUM
+      ollama-url: ${app.ai.ollama.base-url:http://127.0.0.1:11434}
+      ollama-model: ${app.ai.ollama.model:qwen2.5:0.5b}
+      auto-resolve: true
+
+    # ── Tab 4: Alerts & Webhooks ──
+    alert:
+      admin-emails: admin@cybershield.local
+      webhook-url: ""

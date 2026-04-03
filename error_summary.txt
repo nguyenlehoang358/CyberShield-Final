@@ -1,0 +1,95 @@
+﻿
+2026-02-12T14:42:07.545Z  WARN 
+18176 --- [myweb] [           
+main] ConfigServletWebServerApplic
+ationContext : Exception 
+encountered during context 
+initialization - cancelling 
+refresh attempt: org.springframewo
+rk.beans.factory.UnsatisfiedDepend
+encyException: Error creating 
+bean with name 'org.springframewor
+k.security.config.annotation.web.c
+onfiguration.WebSecurityConfigurat
+ion': Unsatisfied dependency 
+expressed through method 
+'setFilterChains' parameter 0: 
+Error creating bean with name 
+'securityFilterChain' defined in 
+class path resource [com/myweb/con
+fig/SecurityConfig.class]: Failed 
+to instantiate [org.springframewor
+k.security.web.SecurityFilterChain
+]: Factory method 
+'securityFilterChain' threw 
+exception with message: No 
+qualifying bean of type 'org.sprin
+gframework.security.oauth2.client.
+registration.ClientRegistrationRep
+ository' available
+[ERROR] [Help 1] http://cwiki.apac
+he.org/confluence/display/MAVEN/Mo
+joExecutionException
+
+
+
+2026-02-12T14:42:07.545Z  WARN 
+18176 --- [myweb] [           
+main] ConfigServletWebServerApplic
+ationContext : Exception 
+encountered during context 
+initialization - cancelling 
+refresh attempt: org.springframewo
+rk.beans.factory.UnsatisfiedDepend
+encyException: Error creating 
+bean with name 'org.springframewor
+k.security.config.annotation.web.c
+onfiguration.WebSecurityConfigurat
+ion': Unsatisfied dependency 
+expressed through method 
+'setFilterChains' parameter 0: 
+Error creating bean with name 
+'securityFilterChain' defined in 
+class path resource [com/myweb/con
+fig/SecurityConfig.class]: Failed 
+to instantiate [org.springframewor
+k.security.web.SecurityFilterChain
+]: Factory method 
+'securityFilterChain' threw 
+exception with message: No 
+qualifying bean of type 'org.sprin
+gframework.security.oauth2.client.
+registration.ClientRegistrationRep
+ository' available
+Error starting 
+ApplicationContext. To display 
+the condition evaluation report 
+re-run your application with 
+'debug' enabled.
+2026-02-12T14:42:07.585Z ERROR 
+18176 --- [myweb] [           
+main] o.s.b.d.LoggingFailureAnalys
+isReporter   : 
+[ERROR] Failed to execute goal org
+.springframework.boot:spring-boot-
+maven-plugin:3.2.5:run 
+(default-cli) on project myweb: 
+Process terminated with exit 
+code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack 
+trace of the errors, re-run Maven 
+with the -e switch.
+[ERROR] Re-run Maven using the -X 
+switch to enable full debug 
+logging.
+[ERROR] 
+[ERROR] For more information 
+about the errors and possible 
+solutions, please read the 
+following articles:
+[ERROR] [Help 1] http://cwiki.apac
+he.org/confluence/display/MAVEN/Mo
+joExecutionException
+
+

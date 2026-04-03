@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="LOGS" value="./logs" />
+
+    <!-- Standard Console Appender for Local Dev readability -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Asynchronous Logstash TCP Appender -->
+    <appender name="Logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!-- Connecting to the logstash container on internal network -->
+        <destination>${LOGSTASH_HOST:-localhost}:5000</destination>
+        
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"app":"cyber-shield"}</customFields>
+        </encoder>
+    </appender>
+
+    <!-- Root Logger Configuration -->
+    <root level="INFO">
+        <appender-ref ref="Console" />
+        <appender-ref ref="Logstash" />
+    </root>
+
+    <!-- Specific Logging Levels -->
+    <logger name="com.myweb.security" level="DEBUG"/>
+    <logger name="com.myweb.service.AuthService" level="INFO"/>
+
+</configuration>

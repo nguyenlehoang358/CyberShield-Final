@@ -1,0 +1,91 @@
+﻿[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< com.myweb:myweb >---------------------------
+[INFO] Building myweb 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.2.5:run (default-cli) > test-compile @ myweb >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ myweb ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 10 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ myweb ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ myweb ---
+[INFO] skip non existing resourceDirectory C:\Users\Asus-PC\myweb\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ myweb ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] <<< spring-boot:3.2.5:run (default-cli) < test-compile @ myweb <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.2.5:run (default-cli) @ myweb ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-02-17T12:50:58.750Z  INFO 7904 --- [myweb] [           main] com.myweb.MywebApplication               : Starting MywebApplication using Java 21.0.1 with PID 7904 (C:\Users\Asus-PC\myweb\target\classes started by Asus-PC in C:\Users\Asus-PC\myweb)
+2026-02-17T12:50:58.752Z  INFO 7904 --- [myweb] [           main] com.myweb.MywebApplication               : No active profile set, falling back to 1 default profile: "default"
+2026-02-17T12:51:00.050Z  INFO 7904 --- [myweb] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-17T12:51:00.112Z  INFO 7904 --- [myweb] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 54 ms. Found 2 JPA repository interfaces.
+2026-02-17T12:51:01.015Z  INFO 7904 --- [myweb] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8443 (https)
+2026-02-17T12:51:01.030Z  INFO 7904 --- [myweb] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-02-17T12:51:01.030Z  INFO 7904 --- [myweb] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-02-17T12:51:01.107Z  INFO 7904 --- [myweb] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-02-17T12:51:01.109Z  INFO 7904 --- [myweb] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2295 ms
+2026-02-17T12:51:01.413Z  INFO 7904 --- [myweb] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-02-17T12:51:01.484Z  INFO 7904 --- [myweb] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-02-17T12:51:01.523Z  INFO 7904 --- [myweb] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-02-17T12:51:01.752Z  INFO 7904 --- [myweb] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-17T12:51:01.777Z  INFO 7904 --- [myweb] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-02-17T12:51:01.933Z  INFO 7904 --- [myweb] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1c0cf193
+2026-02-17T12:51:01.934Z  INFO 7904 --- [myweb] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-02-17T12:51:02.894Z  INFO 7904 --- [myweb] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-17T12:51:02.971Z  INFO 7904 --- [myweb] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-17T12:51:03.798Z  INFO 7904 --- [myweb] [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+2026-02-17T12:51:04.071Z  INFO 7904 --- [myweb] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoint(s) beneath base path '/actuator'
+2026-02-17T12:51:04.204Z  INFO 7904 --- [myweb] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@7f50b08a, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@56a69c47, org.springframework.security.web.context.SecurityContextHolderFilter@620ba2b0, org.springframework.security.web.header.HeaderWriterFilter@1934a7c1, org.springframework.web.filter.CorsFilter@333cedbd, org.springframework.security.web.authentication.logout.LogoutFilter@2aa176de, org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter@3705e3fb, org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter@42b6acc2, com.myweb.security.JwtAuthFilter@8ac12e6, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@71d2bc34, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@4f290f46, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@388b9799, org.springframework.security.web.session.SessionManagementFilter@ab7ac41, org.springframework.security.web.access.ExceptionTranslationFilter@33012e6f, org.springframework.security.web.access.intercept.AuthorizationFilter@30be77cd]
+2026-02-17T12:51:04.662Z  WARN 7904 --- [myweb] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-02-17T12:51:04.666Z  INFO 7904 --- [myweb] [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-17T12:51:04.668Z  INFO 7904 --- [myweb] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-02-17T12:51:04.670Z  INFO 7904 --- [myweb] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-02-17T12:51:04.687Z  INFO 7904 --- [myweb] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-02-17T12:51:04.706Z ERROR 7904 --- [myweb] [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8443 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8443 or configure this application to listen on another port.
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  9.378 s
+[INFO] Finished at: 2026-02-17T12:51:04Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.2.5:run (default-cli) on project myweb: Process terminated with exit code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

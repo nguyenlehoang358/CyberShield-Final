@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyWeb - Trusted Development Partner</title>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/varmeta.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">MyWeb</a>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li>
+                    <a href="/dashboard.html" id="dashboard-link" class="nav-link" style="display:none;"><i class='bx bx-grid-alt'></i> Dashboard</a>
+                    <span id="user-badge" class="user-badge" style="display:none;"></span>
+                    <a href="/login.html" id="login-link" class="btn-login">Login</a>
+                    <a href="#" id="logout-link" class="btn-logout" style="display:none;">Logout</a>
+                </li>
+            </ul>
+            <button class="nav-toggle" aria-label="Menu"><i class='bx bx-menu'></i></button>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1>Trusted Development Partner</h1>
+            <p>Chúng tôi chuyên phát triển các giải pháp công nghệ từ AI, Blockchain đến Web Application. Cùng xây dựng tương lai với công nghệ.</p>
+            <div class="hero-btns">
+                <a href="/login.html" id="hero-cta" class="btn btn-primary">Bắt đầu ngay</a>
+                <a href="#services" class="btn btn-outline">Xem dịch vụ</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="services">
+        <div class="container">
+            <h2>Dịch vụ của chúng tôi</h2>
+            <p class="section-desc">Chúng tôi xây dựng sản phẩm từ ý tưởng đến triển khai hoàn chỉnh.</p>
+            <div class="services-grid">
+                <div class="service-card">
+                    <i class='bx bx-code-alt'></i>
+                    <h3>Web Development</h3>
+                    <p>Phát triển web hiện đại, responsive với công nghệ mới nhất.</p>
+                </div>
+                <div class="service-card">
+                    <i class='bx bx-data'></i>
+                    <h3>AI / Data</h3>
+                    <p>Giải pháp AI và phân tích dữ liệu giúp doanh nghiệp vượt trội.</p>
+                </div>
+                <div class="service-card">
+                    <i class='bx bx-cube'></i>
+                    <h3>Blockchain</h3>
+                    <p>Tư vấn và phát triển ứng dụng Blockchain chuyên nghiệp.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <div class="container">
+            <h2>Về chúng tôi</h2>
+            <p class="section-desc">Đội ngũ chuyên gia giàu kinh nghiệm, cam kết mang đến sản phẩm chất lượng cao.</p>
+        </div>
+    </section>
+
+    <footer id="contact" class="footer">
+        <div class="container">
+            <p>&copy; 2026 MyWeb. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Auth.checkAndUpdateUI();
+            document.getElementById('logout-link')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                Auth.logout();
+                window.location.href = '/';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,676 @@
+﻿
+2026-02-12T14:46:09.885Z  WARN 
+15612 --- [myweb] [           
+main] ConfigServletWebServerApplic
+ationContext : Exception 
+encountered during context 
+initialization - cancelling 
+refresh attempt: org.springframewo
+rk.beans.factory.UnsatisfiedDepend
+encyException: Error creating 
+bean with name 'org.springframewor
+k.security.config.annotation.web.c
+onfiguration.WebSecurityConfigurat
+ion': Unsatisfied dependency 
+expressed through field 
+'httpSecurity': Error creating 
+bean with name 'org.springframewor
+k.security.config.annotation.web.c
+onfiguration.HttpSecurityConfigura
+tion': Unsatisfied dependency 
+expressed through method 
+'setContentNegotiationStrategy' 
+parameter 0: Error creating bean 
+with name 'org.springframework.boo
+t.autoconfigure.web.servlet.WebMvc
+AutoConfiguration$EnableWebMvcConf
+iguration': Unsatisfied 
+dependency expressed through 
+method 'setConfigurers' parameter 
+0: Error creating bean with name '
+org.springframework.security.confi
+g.annotation.web.configuration.OAu
+th2ClientConfiguration$OAuth2Clien
+tWebMvcSecurityConfiguration': 
+Unsatisfied dependency expressed 
+through method 
+'setAuthorizedClientManager' 
+parameter 0: Error creating bean 
+with name 
+'OAuth2AuthorizedClientManager': 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+org.springframework.beans.factory.
+UnsatisfiedDependencyException: 
+Error creating bean with name 'org
+.springframework.security.config.a
+nnotation.web.configuration.WebSec
+urityConfiguration': Unsatisfied 
+dependency expressed through 
+field 'httpSecurity': Error 
+creating bean with name 'org.sprin
+gframework.security.config.annotat
+ion.web.configuration.HttpSecurity
+Configuration': Unsatisfied 
+dependency expressed through 
+method 
+'setContentNegotiationStrategy' 
+parameter 0: Error creating bean 
+with name 'org.springframework.boo
+t.autoconfigure.web.servlet.WebMvc
+AutoConfiguration$EnableWebMvcConf
+iguration': Unsatisfied 
+dependency expressed through 
+method 'setConfigurers' parameter 
+0: Error creating bean with name '
+org.springframework.security.confi
+g.annotation.web.configuration.OAu
+th2ClientConfiguration$OAuth2Clien
+tWebMvcSecurityConfiguration': 
+Unsatisfied dependency expressed 
+through method 
+'setAuthorizedClientManager' 
+parameter 0: Error creating bean 
+with name 
+'OAuth2AuthorizedClientManager': 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: org.springframework.bea
+ns.factory.UnsatisfiedDependencyEx
+ception: Error creating bean with 
+name 'org.springframework.security
+.config.annotation.web.configurati
+on.HttpSecurityConfiguration': 
+Unsatisfied dependency expressed 
+through method 
+'setContentNegotiationStrategy' 
+parameter 0: Error creating bean 
+with name 'org.springframework.boo
+t.autoconfigure.web.servlet.WebMvc
+AutoConfiguration$EnableWebMvcConf
+iguration': Unsatisfied 
+dependency expressed through 
+method 'setConfigurers' parameter 
+0: Error creating bean with name '
+org.springframework.security.confi
+g.annotation.web.configuration.OAu
+th2ClientConfiguration$OAuth2Clien
+tWebMvcSecurityConfiguration': 
+Unsatisfied dependency expressed 
+through method 
+'setAuthorizedClientManager' 
+parameter 0: Error creating bean 
+with name 
+'OAuth2AuthorizedClientManager': 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: org.springframework.bea
+ns.factory.UnsatisfiedDependencyEx
+ception: Error creating bean with 
+name 'org.springframework.boot.aut
+oconfigure.web.servlet.WebMvcAutoC
+onfiguration$EnableWebMvcConfigura
+tion': Unsatisfied dependency 
+expressed through method 
+'setConfigurers' parameter 0: 
+Error creating bean with name 'org
+.springframework.security.config.a
+nnotation.web.configuration.OAuth2
+ClientConfiguration$OAuth2ClientWe
+bMvcSecurityConfiguration': 
+Unsatisfied dependency expressed 
+through method 
+'setAuthorizedClientManager' 
+parameter 0: Error creating bean 
+with name 
+'OAuth2AuthorizedClientManager': 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: org.springframework.bea
+ns.factory.UnsatisfiedDependencyEx
+ception: Error creating bean with 
+name 'org.springframework.security
+.config.annotation.web.configurati
+on.OAuth2ClientConfiguration$OAuth
+2ClientWebMvcSecurityConfiguration
+': Unsatisfied dependency 
+expressed through method 
+'setAuthorizedClientManager' 
+parameter 0: Error creating bean 
+with name 
+'OAuth2AuthorizedClientManager': 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: org.springframework.bea
+ns.factory.BeanCreationException: 
+Error creating bean with name 
+'OAuth2AuthorizedClientManager': 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: org.springframework.bea
+ns.BeanInstantiationException: 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: org.springframework.bea
+ns.factory.BeanCreationException: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: org.springframework.bea
+ns.BeanInstantiationException: 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.re
+gistration.InMemoryClientRegistrat
+ionRepository]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: java.lang.IllegalArgume
+ntException: Unable to resolve 
+Configuration with the provided 
+Issuer of 
+"https://accounts.indeed.com"
+[ERROR] [Help 1] http://cwiki.apac
+he.org/confluence/display/MAVEN/Mo
+joExecutionException
+
+
+
+2026-02-12T14:46:09.885Z  WARN 
+15612 --- [myweb] [           
+main] ConfigServletWebServerApplic
+ationContext : Exception 
+encountered during context 
+initialization - cancelling 
+refresh attempt: org.springframewo
+rk.beans.factory.UnsatisfiedDepend
+encyException: Error creating 
+bean with name 'org.springframewor
+k.security.config.annotation.web.c
+onfiguration.WebSecurityConfigurat
+ion': Unsatisfied dependency 
+expressed through field 
+'httpSecurity': Error creating 
+bean with name 'org.springframewor
+k.security.config.annotation.web.c
+onfiguration.HttpSecurityConfigura
+tion': Unsatisfied dependency 
+expressed through method 
+'setContentNegotiationStrategy' 
+parameter 0: Error creating bean 
+with name 'org.springframework.boo
+t.autoconfigure.web.servlet.WebMvc
+AutoConfiguration$EnableWebMvcConf
+iguration': Unsatisfied 
+dependency expressed through 
+method 'setConfigurers' parameter 
+0: Error creating bean with name '
+org.springframework.security.confi
+g.annotation.web.configuration.OAu
+th2ClientConfiguration$OAuth2Clien
+tWebMvcSecurityConfiguration': 
+Unsatisfied dependency expressed 
+through method 
+'setAuthorizedClientManager' 
+parameter 0: Error creating bean 
+with name 
+'OAuth2AuthorizedClientManager': 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Error starting 
+ApplicationContext. To display 
+the condition evaluation report 
+re-run your application with 
+'debug' enabled.
+2026-02-12T14:46:09.912Z ERROR 
+15612 --- [myweb] [           
+main] o.s.boot.SpringApplication  
+             : Application run 
+failed
+org.springframework.beans.factory.
+UnsatisfiedDependencyException: 
+Error creating bean with name 'org
+.springframework.security.config.a
+nnotation.web.configuration.WebSec
+urityConfiguration': Unsatisfied 
+dependency expressed through 
+field 'httpSecurity': Error 
+creating bean with name 'org.sprin
+gframework.security.config.annotat
+ion.web.configuration.HttpSecurity
+Configuration': Unsatisfied 
+dependency expressed through 
+method 
+'setContentNegotiationStrategy' 
+parameter 0: Error creating bean 
+with name 'org.springframework.boo
+t.autoconfigure.web.servlet.WebMvc
+AutoConfiguration$EnableWebMvcConf
+iguration': Unsatisfied 
+dependency expressed through 
+method 'setConfigurers' parameter 
+0: Error creating bean with name '
+org.springframework.security.confi
+g.annotation.web.configuration.OAu
+th2ClientConfiguration$OAuth2Clien
+tWebMvcSecurityConfiguration': 
+Unsatisfied dependency expressed 
+through method 
+'setAuthorizedClientManager' 
+parameter 0: Error creating bean 
+with name 
+'OAuth2AuthorizedClientManager': 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: org.springframework.bea
+ns.factory.UnsatisfiedDependencyEx
+ception: Error creating bean with 
+name 'org.springframework.security
+.config.annotation.web.configurati
+on.HttpSecurityConfiguration': 
+Unsatisfied dependency expressed 
+through method 
+'setContentNegotiationStrategy' 
+parameter 0: Error creating bean 
+with name 'org.springframework.boo
+t.autoconfigure.web.servlet.WebMvc
+AutoConfiguration$EnableWebMvcConf
+iguration': Unsatisfied 
+dependency expressed through 
+method 'setConfigurers' parameter 
+0: Error creating bean with name '
+org.springframework.security.confi
+g.annotation.web.configuration.OAu
+th2ClientConfiguration$OAuth2Clien
+tWebMvcSecurityConfiguration': 
+Unsatisfied dependency expressed 
+through method 
+'setAuthorizedClientManager' 
+parameter 0: Error creating bean 
+with name 
+'OAuth2AuthorizedClientManager': 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: org.springframework.bea
+ns.factory.UnsatisfiedDependencyEx
+ception: Error creating bean with 
+name 'org.springframework.boot.aut
+oconfigure.web.servlet.WebMvcAutoC
+onfiguration$EnableWebMvcConfigura
+tion': Unsatisfied dependency 
+expressed through method 
+'setConfigurers' parameter 0: 
+Error creating bean with name 'org
+.springframework.security.config.a
+nnotation.web.configuration.OAuth2
+ClientConfiguration$OAuth2ClientWe
+bMvcSecurityConfiguration': 
+Unsatisfied dependency expressed 
+through method 
+'setAuthorizedClientManager' 
+parameter 0: Error creating bean 
+with name 
+'OAuth2AuthorizedClientManager': 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: org.springframework.bea
+ns.factory.UnsatisfiedDependencyEx
+ception: Error creating bean with 
+name 'org.springframework.security
+.config.annotation.web.configurati
+on.OAuth2ClientConfiguration$OAuth
+2ClientWebMvcSecurityConfiguration
+': Unsatisfied dependency 
+expressed through method 
+'setAuthorizedClientManager' 
+parameter 0: Error creating bean 
+with name 
+'OAuth2AuthorizedClientManager': 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: org.springframework.bea
+ns.factory.BeanCreationException: 
+Error creating bean with name 
+'OAuth2AuthorizedClientManager': 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: org.springframework.bea
+ns.BeanInstantiationException: 
+Failed to instantiate [org.springf
+ramework.security.oauth2.client.OA
+uth2AuthorizedClientManager]: 
+Factory method 
+'getAuthorizedClientManager' 
+threw exception with message: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+Caused by: org.springframework.bea
+ns.factory.BeanCreationException: 
+Error creating bean with name 
+'clientRegistrationRepository' 
+defined in class path resource [or
+g/springframework/boot/autoconfigu
+re/security/oauth2/client/servlet/
+OAuth2ClientRegistrationRepository
+Configuration.class]: Failed to 
+instantiate [org.springframework.s
+ecurity.oauth2.client.registration
+.InMemoryClientRegistrationReposit
+ory]: Factory method 
+'clientRegistrationRepository' 
+threw exception with message: 
+Unable to resolve Configuration 
+with the provided Issuer of 
+"https://accounts.indeed.com"
+[ERROR] Failed to execute goal org
+.springframework.boot:spring-boot-
+maven-plugin:3.2.5:run 
+(default-cli) on project myweb: 
+Process terminated with exit 
+code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack 
+trace of the errors, re-run Maven 
+with the -e switch.
+[ERROR] Re-run Maven using the -X 
+switch to enable full debug 
+logging.
+[ERROR] 
+[ERROR] For more information 
+about the errors and possible 
+solutions, please read the 
+following articles:
+[ERROR] [Help 1] http://cwiki.apac
+he.org/confluence/display/MAVEN/Mo
+joExecutionException
+
+

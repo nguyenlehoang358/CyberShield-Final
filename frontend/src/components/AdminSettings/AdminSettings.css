@@ -1,0 +1,308 @@
+/* Fullview Layout */
+.admin-settings-fullview {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding: 2rem;
+    padding-bottom: 120px;
+    background: transparent;
+    color: var(--text-primary);
+    min-height: 100vh;
+}
+
+/* Page Header */
+.admin-settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.admin-settings-header h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(90deg, var(--text-primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.stat-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+}
+
+.stat-badge.info { color: #3b82f6; border-color: rgba(59, 130, 246, 0.3); }
+.stat-badge.purple { color: #8b5cf6; border-color: rgba(139, 92, 246, 0.3); }
+
+/* Settings Grid */
+.admin-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 2rem;
+}
+
+/* Panel Adjustments for Grid */
+.admin-settings-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-settings-panel:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 15px 40px rgba(59, 130, 246, 0.1);
+    transform: translateY(-5px);
+}
+
+.admin-settings-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+}
+
+.admin-panel-header {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    padding-bottom: 1rem;
+}
+
+.admin-panel-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* Settings List */
+.admin-settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.admin-setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.1);
+}
+
+.admin-setting-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.admin-setting-info {
+    flex: 1;
+    padding-right: 1rem;
+}
+
+.admin-setting-info h4 {
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.admin-setting-info p {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.admin-setting-action {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Small Inputs for Compact Grid */
+.admin-select-input-sm {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    outline: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: auto;
+    min-width: 100px;
+}
+
+/* Neo-Cyberpunk Focus Effect */
+.admin-select-input-sm:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5), 0 0 5px rgba(59, 130, 246, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Error State (Red Neon) - Optional utility class */
+.admin-select-input-sm.error {
+    border-color: #ef4444;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+}
+
+.admin-test-btn {
+    background: var(--bg-card-hover);
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.admin-test-btn:hover {
+    background: #0f172a;
+    color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+/* UI Switch Toggle (iOS/Android Style but Hacker Blue) */
+.ui-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.ui-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ui-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-card-hover);
+    transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 34px;
+    border: 1px solid var(--border-light);
+}
+
+.ui-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 2px;
+    background-color: var(--text-secondary);
+    transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+}
+
+.ui-switch input:checked + .slider {
+    background-color: #0f172a; 
+    border-color: #3b82f6;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+.ui-switch input:checked + .slider:before {
+    transform: translateX(23px);
+    background-color: #3b82f6;
+}
+
+/* Floating Save Bar (Neo-Cyberpunk Upgrade) */
+.admin-floating-save {
+    position: fixed;
+    bottom: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--border-light);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.8), 0 0 30px rgba(59, 130, 246, 0.1);
+    padding: 1rem 3rem;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    z-index: 9999;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+}
+
+.admin-floating-save.visible {
+    bottom: 40px;
+    opacity: 1;
+    border-color: #fbbf24;
+    box-shadow: 0 0 40px rgba(251, 191, 36, 0.4), 0 0 100px rgba(0,0,0,0.5);
+    animation: floatingNeon 2s infinite ease-in-out;
+}
+
+@keyframes floatingNeon {
+    0%, 100% { transform: translateX(-50%) translateY(0); box-shadow: 0 0 30px rgba(251, 191, 36, 0.3); }
+    50% { transform: translateX(-50%) translateY(-5px); box-shadow: 0 0 50px rgba(251, 191, 36, 0.5); }
+}
+
+.admin-floating-save span {
+    color: #fbbf24;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.admin-btn {
+    background: #fbbf24;
+    color: #000;
+    border: none;
+    padding: 0.75rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+}
+
+.admin-btn:hover {
+    background: #ffffff;
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+}

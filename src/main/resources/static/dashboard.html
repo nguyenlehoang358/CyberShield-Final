@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/varmeta.css">
+    <link rel="stylesheet" href="./css/dashboard.css">
+    <title>Dashboard | MyWeb</title>
+</head>
+<body class="dashboard-page">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="logo">MyWeb</a>
+            <span class="badge">Admin</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-section="overview">
+                <i class='bx bx-grid-alt'></i>
+                <span>Tổng quan</span>
+            </a>
+            <a href="#" class="nav-item" data-section="database">
+                <i class='bx bx-data'></i>
+                <span>Database</span>
+            </a>
+            <a href="#" class="nav-item" data-section="users">
+                <i class='bx bx-user'></i>
+                <span>Người dùng</span>
+            </a>
+            <a href="#" class="nav-item disabled">
+                <i class='bx bx-cog'></i>
+                <span>Cài đặt</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/" class="nav-item"><i class='bx bx-home'></i> <span>Về trang chủ</span></a>
+            <a href="#" id="logout-btn" class="nav-item"><i class='bx bx-log-out'></i> <span>Đăng xuất</span></a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="dashboard-header">
+            <h1 id="page-title">Tổng quan</h1>
+            <div class="header-actions">
+                <span class="user-info" id="user-info"></span>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Section: Tổng quan -->
+            <section id="section-overview" class="dashboard-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class='bx bx-user stat-icon'></i>
+                        <div>
+                            <span class="stat-value" id="stat-users">-</span>
+                            <span class="stat-label">Người dùng</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class='bx bx-table stat-icon'></i>
+                        <div>
+                            <span class="stat-value" id="stat-tables">-</span>
+                            <span class="stat-label">Bảng dữ liệu</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Database -->
+            <section id="section-database" class="dashboard-section" style="display:none">
+                <div class="db-tabs">
+                    <button class="db-tab active" data-tab="users">Bảng users</button>
+                </div>
+                <div class="db-content">
+                    <div class="db-table-wrapper">
+                        <div class="table-header">
+                            <h3>Dữ liệu bảng users</h3>
+                            <button class="btn btn-sm btn-primary" id="refresh-users"><i class='bx bx-refresh'></i> Làm mới</button>
+                        </div>
+                        <div class="table-scroll">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>OAuth</th>
+                                        <th>Roles</th>
+                                        <th>Ngày tạo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                    <tr><td colspan="6" class="loading">Đang tải...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Users (alias for database/users) -->
+            <section id="section-users" class="dashboard-section" style="display:none">
+                <p class="placeholder">Chuyển đến mục Database để quản lý người dùng.</p>
+            </section>
+        </div>
+    </main>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>

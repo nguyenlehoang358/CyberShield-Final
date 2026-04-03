@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/varmeta.css">
+    <link rel="stylesheet" href="./css/login_register.css">
+    <title>Đăng nhập | MyWeb</title>
+</head>
+<body class="auth-page">
+    <a href="/" class="back-home"><i class='bx bx-arrow-back'></i> Về trang chủ</a>
+
+    <div class="auth-container">
+        <div class="form-wrapper">
+        <div class="form-box login">
+            <form id="login-form" method="POST">
+                <h1>ĐĂNG NHẬP</h1>
+                <div id="login-error" class="error-msg" style="display:none;"></div>
+                <div class="input-box">
+                    <i class='bx bx-envelope'></i>
+                    <input type="email" name="email" placeholder="Email" required>
+                </div>
+                <div class="input-box">
+                    <i class='bx bx-lock-alt'></i>
+                    <input type="password" name="password" placeholder="Mật khẩu" required>
+                </div>
+                <div class="forgot-link">
+                    <a href="#">Quên mật khẩu?</a>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">ĐĂNG NHẬP</button>
+                <p class="divider">Hoặc đăng nhập bằng (cần cấu hình OAuth2 trong backend)</p>
+                <div class="social-icons">
+                    <a href="/oauth2/authorization/google" title="Google" class="social-btn">
+                        <i class='bx bxl-google'></i>
+                    </a>
+                    <a href="/oauth2/authorization/facebook" title="Facebook" class="social-btn">
+                        <i class='bx bxl-facebook'></i>
+                    </a>
+                    <a href="/oauth2/authorization/github" title="GitHub" class="social-btn">
+                        <i class='bx bxl-github'></i>
+                    </a>
+                    <a href="/oauth2/authorization/indeed" title="Indeed" class="social-btn">
+                         <i class='bx bxl-linkedin'></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="form-box register">
+            <form id="register-form" method="POST">
+                <h1>ĐĂNG KÝ</h1>
+                <div id="register-error" class="error-msg" style="display:none;"></div>
+                <div class="input-box">
+                    <i class='bx bx-user'></i>
+                    <input type="text" name="username" placeholder="Username" required minlength="3">
+                </div>
+                <div class="input-box">
+                    <i class='bx bx-envelope'></i>
+                    <input type="email" name="email" placeholder="Email" required>
+                </div>
+                <div class="input-box">
+                    <i class='bx bx-lock-alt'></i>
+                    <input type="password" name="password" placeholder="Mật khẩu" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">ĐĂNG KÝ</button>
+                <p class="divider">Hoặc đăng ký bằng</p>
+                <div class="social-icons">
+                    <a href="/oauth2/authorization/google" title="Google" class="social-btn">
+                        <i class='bx bxl-google'></i>
+                    </a>
+                    <a href="/oauth2/authorization/facebook" title="Facebook" class="social-btn">
+                        <i class='bx bxl-facebook'></i>
+                    </a>
+                    <a href="/oauth2/authorization/github" title="GitHub" class="social-btn">
+                         <i class='bx bxl-github'></i>
+                    </a>
+                    <a href="/oauth2/authorization/indeed" title="Indeed" class="social-btn">
+                        <i class='bx bxl-linkedin'></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+        </div>
+
+        <div class="toggle-box">
+            <div class="toggle-panel toggle-left">
+                <h1>Xin chào!</h1>
+                <p>Chưa có tài khoản?</p>
+                <button type="button" class="btn btn-outline register-btn">ĐĂNG KÝ</button>
+            </div>
+            <div class="toggle-panel toggle-right">
+                <h1>Chào mừng trở lại!</h1>
+                <p>Đã có tài khoản?</p>
+                <button type="button" class="btn btn-outline login-btn">ĐĂNG NHẬP</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/login_register.js"></script>
+    <script>
+        // Check for token in URL (from Social Login)
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const error = urlParams.get('error');
+
+        if (token) {
+            Auth.setToken(token);
+            // Redirect to dashboard or home
+            window.location.href = '/dashboard.html';
+        }
+        
+        if (error) {
+             const errorMsg = document.getElementById('login-error');
+             if(errorMsg) {
+                 errorMsg.innerText = "Lỗi đăng nhập social: " + error;
+                 errorMsg.style.display = 'block';
+             }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+.dashboard-page {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: var(--bg-card);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sidebar-header .logo {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.sidebar-header .badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    background: var(--accent);
+    border-radius: 4px;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 1rem 0.75rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: var(--text-secondary);
+    border-radius: 8px;
+    margin-bottom: 0.25rem;
+    transition: all 0.2s;
+}
+
+.nav-item:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+}
+
+.nav-item.active {
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--accent);
+}
+
+.nav-item.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.nav-item i {
+    font-size: 1.25rem;
+}
+
+.sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.sidebar-footer .nav-item {
+    margin-bottom: 0.25rem;
+}
+
+/* Main content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.dashboard-header {
+    padding: 1.25rem 2rem;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dashboard-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.user-info {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.content-area {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+/* Stats */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    color: var(--accent);
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Database section */
+.db-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.db-tab {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.db-tab:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.db-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+}
+
+.db-table-wrapper {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.table-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.btn-sm {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.table-scroll {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 0.875rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+    background: rgba(0,0,0,0.2);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.data-table td {
+    font-size: 0.9rem;
+}
+
+.data-table tr:hover td {
+    background: rgba(255,255,255,0.02);
+}
+
+.data-table .loading {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 2rem !important;
+}
+
+.placeholder {
+    color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 72px;
+        min-width: 72px;
+    }
+
+    .sidebar-header .logo,
+    .nav-item span,
+    .sidebar-header .badge {
+        display: none;
+    }
+
+    .nav-item {
+        justify-content: center;
+        padding: 1rem;
+    }
+
+    .content-area {
+        padding: 1rem;
+    }
+}

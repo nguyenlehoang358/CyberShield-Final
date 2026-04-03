@@ -1,0 +1,502 @@
+
+/* About Page Full Styling */
+
+/* =========================================
+   Utility Classes (Emulating Tailwind)
+   ========================================= */
+.text-center { text-align: center; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.mb-8 { margin-bottom: 2rem; }
+.mb-10 { margin-bottom: 2.5rem; }
+.mb-16 { margin-bottom: 4rem; }
+.py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+.py-20 { padding-top: 5rem; padding-bottom: 5rem; }
+.relative { position: relative; }
+.overflow-hidden { overflow: hidden; }
+.z-10 { z-index: 10; }
+.bg-white { background-color: white; }
+.border-b { border-bottom-width: 1px; }
+.border-border-light { border-color: rgba(0,0,0,0.1); }
+.max-w-2xl { max-width: 42rem; }
+.max-w-3xl { max-width: 48rem; }
+.font-bold { font-weight: 700; }
+.text-lg { font-size: 1.125rem; }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.gap-4 { gap: 1rem; }
+.rounded-lg { border-radius: 0.5rem; }
+.p-3 { padding: 0.75rem; }
+.justify-center { justify-content: center; }
+.flex-wrap { flex-wrap: wrap; }
+
+/* =========================================
+   Component Styles
+   ========================================= */
+
+/* Fade In Animation */
+.about-page {
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Grids */
+.about-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .about-stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.about-story-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+@media (min-width: 768px) {
+    .about-story-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.about-values-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .about-values-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.about-team-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 640px) {
+    .about-team-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .about-team-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Typography & Colors */
+.hero-title {
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: white; /* Assuming section-dark background */
+}
+
+@media (min-width: 768px) {
+    .hero-title {
+        font-size: 4.5rem;
+    }
+}
+
+.hero-subtitle {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2.5rem;
+}
+
+.section-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.section-dark .section-title {
+    color: white;
+}
+
+.text-secondary {
+    color: var(--text-secondary, #6b7280);
+}
+
+.text-accent {
+    color: var(--accent, #667eea);
+}
+
+.text-accent-secondary {
+    color: var(--accent-secondary, #764ba2);
+}
+
+.text-accent-pink {
+    color: var(--accent-pink, #f093fb);
+}
+
+.text-accent-coral {
+    color: var(--accent-coral, #f5576c);
+}
+
+.text-accent-cyan {
+    color: var(--accent-cyan, #38f9d7);
+}
+
+.text-gray-400 {
+    color: #9ca3af;
+}
+
+/* Stats Section */
+.stat-item {
+    text-align: center;
+    padding: 2rem;
+    border-radius: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-5px);
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-secondary, #6b7280);
+}
+
+/* Story Section */
+.story-image-wrapper {
+    position: relative;
+    padding: 1rem;
+}
+
+.story-bg-decoration {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--accent, #667eea), var(--accent-pink, #f093fb));
+    opacity: 0.1;
+    border-radius: 1.5rem;
+    transform: rotate(3deg);
+    z-index: 0;
+}
+
+.story-img {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    border-radius: 1rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.story-quote-card {
+    position: absolute;
+    bottom: -1rem;
+    right: -1rem;
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    z-index: 20;
+    max-width: 250px;
+    border: 1px solid var(--border-light);
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .story-quote-card {
+        display: block;
+    }
+}
+
+.quote-text {
+    font-style: italic;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+    margin-bottom: 0.5rem;
+}
+
+.quote-author {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+
+.mission-vision-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.mission-item, .vision-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.icon-box {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    width: 48px;
+    height: 48px;
+}
+
+/* Colors for icon boxes */
+.bg-blue-50 { background-color: #eff6ff; }
+.bg-purple-50 { background-color: #f5f3ff; }
+
+.item-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+/* Values Section */
+.bg-grid-white {
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    position: absolute;
+    inset: 0;
+}
+
+.value-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+}
+
+.value-card:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.value-icon-box {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    color: white;
+}
+
+.gradient-blue { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+.gradient-purple { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+.gradient-pink { background: linear-gradient(135deg, #ec4899, #f97316); }
+
+.value-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.75rem;
+}
+
+.value-desc {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+}
+
+/* Team Section */
+.team-card {
+    background: var(--bg-card);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+}
+
+.team-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.team-img-wrapper {
+    position: relative;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+}
+
+.team-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.team-card:hover .team-img {
+    transform: scale(1.1);
+}
+
+.team-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.team-card:hover .team-overlay {
+    opacity: 1;
+}
+
+.team-socials {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.team-social-link {
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.team-social-link:hover {
+    color: var(--accent, #667eea);
+}
+
+.team-info {
+    padding: 1rem;
+    /* text-center; */
+}
+
+.team-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.team-role {
+    font-size: 0.875rem;
+    color: var(--accent, #667eea);
+    font-weight: 500;
+}
+
+/* CTA Section */
+.cta-box {
+    background: linear-gradient(135deg, var(--accent, #667eea), var(--accent-secondary, #764ba2));
+    border-radius: 1.5rem;
+    padding: 4rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    color: white;
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+    --mouse-x: 0.5;
+    --mouse-y: 0.5;
+    transition: transform 0.1s;
+}
+
+.cta-orb {
+    position: absolute;
+    border-radius: 50%;
+    background: white;
+    opacity: 0.1;
+    filter: blur(40px);
+    transition: transform 0.2s ease-out;
+}
+
+.group:hover .cta-orb-1 {
+    transform: translate(calc(var(--mouse-x) * -20px), calc(var(--mouse-y) * -20px));
+}
+
+.group:hover .cta-orb-2 {
+    transform: translate(calc(var(--mouse-x) * 20px), calc(var(--mouse-y) * 20px));
+}
+
+.cta-orb-1 { width: 300px; height: 300px; top: -100px; right: -50px; }
+.cta-orb-2 { width: 250px; height: 250px; bottom: -50px; left: -50px; }
+
+.cta-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.cta-text {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 36rem;
+    margin: 0 auto 2rem;
+}
+
+.cta-btn {
+    background: white;
+    color: var(--accent, #667eea);
+    padding: 0.875rem 2rem;
+    border-radius: 9999px; /* full pill */
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    background: #f8f9fa;
+}
+
+.cta-btn-outline {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    box-shadow: none;
+}
+
+.cta-btn-outline:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
