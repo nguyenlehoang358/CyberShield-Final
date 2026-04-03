@@ -1,4 +1,5 @@
 package com.myweb.entity;
+
 import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -17,6 +18,10 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "login_attempts")
 public class LoginAttempt {
+
+    public enum Status {
+        SUCCESS, FAILURE
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,8 +50,6 @@ public class LoginAttempt {
     @Column(name = "created_at")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Ho_Chi_Minh")
     private Instant createdAt;
-
-    
 
     public LoginAttempt() {
         this.createdAt = Instant.now();

@@ -1,73 +1,48 @@
 package com.myweb.service;
 
+import java.time.Instant;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.myweb.entity.BlockedIpHistory;
+import com.myweb.entity.LoginAttempt;
 import com.myweb.repository.BlockedIpHistoryRepository;
+import com.myweb.repository.LoginAttemptRepository;
 
 /**
- * Brute Force Protection Service — Redis-backed login attempt tracking.
- *
- * Features:
- * - Track failed login attempts per IP and per username
- * - Progressive lockout: 3→CAPTCHA, 5→1min, 10→5min, 20→1h
- * - Auto IP blocking with TTL
- * - IP whitelist support
- *
- * Redis Keys:
- * bf:failures:ip:{ip} → failure count (TTL: 1h)
- * bf:failures:user:{username} → failure count (TTL: 1h)
- * bf:blocked:{ip} → "1" (TTL: dynamic)
- * bf:captcha:{ip} → "1" (TTL: 5min)
+ * Brute Force Protection Service — Database-backed (PostgreSQL) tracking.
+ * Optimized for Render/Vercel environments without Redis.
  */
 @Service
 public class BruteForceProtectionService {
 
     private static final Logger log = LoggerFactory.getLogger(BruteForceProtectionService.class);
 
-    private static final String IP_FAILURE_KEY = "bf:failures:ip:";
-    private static final String USER_FAILURE_KEY = "bf:failures:user:";
-    private static final String BLOCKED_KEY = "bf:blocked:";
-    private static final String CAPTCHA_KEY = "bf:captcha:";
-
-    private final StringRedisTemplate redisTemplate;
     private final SecurityEventService securityEventService;
     private final BlockedIpHistoryRepository blockedIpRepo;
+    private final LoginAttemptRepository loginAttemptRepo;
     private final com.myweb.service.SystemSettingService settingService;
-    private final boolean redisAvailable;
 
     public BruteForceProtectionService(
-            StringRedisTemplate redisTemplate,
             @Lazy SecurityEventService securityEventService,
             BlockedIpHistoryRepository blockedIpRepo,
+            LoginAttemptRepository loginAttemptRepo,
             com.myweb.service.SystemSettingService settingService) {
-        this.redisTemplate = redisTemplate;
         this.securityEventService = securityEventService;
         this.blockedIpRepo = blockedIpRepo;
+        this.loginAttemptRepo = loginAttemptRepo;
         this.settingService = settingService;
-
-        boolean isAvailable = false;
-        try {
-            var connFactory = redisTemplate.getConnectionFactory();
-            if (connFactory != null) {
-                connFactory.getConnection().ping();
-                isAvailable = true;
-            }
-        } catch (Exception e) {
-            log.warn("🚨 REDIS IS DOWN! BruteForceProtectionService is DISABLED.");
-        }
-        this.redisAvailable = isAvailable;
+        log.info("🛡️ BruteForceProtectionService initialized with Database (PostgreSQL) backend.");
     }
 
     public int getMaxAttempts() {
@@ -82,213 +57,95 @@ public class BruteForceProtectionService {
         return Integer.parseInt(settingService.getSettingValue("defense.block_duration_minutes", "60"));
     }
 
-    public int getEscalationMultiplier() {
-        return Integer.parseInt(settingService.getSettingValue("defense.escalation_multiplier", "5"));
-    }
-
-    public int getPermanentBlockThreshold() {
-        return Integer.parseInt(settingService.getSettingValue("defense.permanent_block_threshold", "50"));
-    }
-
-    public String getIpWhitelist() {
-        return settingService.getSettingValue("defense.ip_whitelist", "");
-    }
-
     /**
-     * Check if an IP is currently blocked.
+     * Check if an IP is currently blocked by checking Database history and time.
      */
     public boolean isBlocked(String ip) {
-        if (!redisAvailable || isWhitelisted(ip))
+        if (isWhitelisted(ip))
             return false;
-        try {
-            return Boolean.TRUE.equals(redisTemplate.hasKey(BLOCKED_KEY + ip));
-        } catch (Exception e) {
-            log.error("Redis error checking blocked IP: {}", e.getMessage());
-            return false;
+
+        Optional<BlockedIpHistory> latestBlock = blockedIpRepo.findTopByIpAddressOrderByCreatedAtDesc(ip);
+        if (latestBlock.isPresent()) {
+            BlockedIpHistory block = latestBlock.get();
+            // Nếu lý do chứa "_UNBLOCKED" thì coi như đã được gỡ
+            if (block.getReason().contains("_UNBLOCKED"))
+                return false;
+
+            // Tính toán thời gian hết hạn (Mặc định 1 giờ nếu không xác định được)
+            Instant expiry = block.getCreatedAt().plus(Duration.ofMinutes(getLockDurationMinutes()));
+            return Instant.now().isBefore(expiry);
         }
+        return false;
     }
 
     /**
-     * Check if CAPTCHA should be required for this IP.
+     * Check if CAPTCHA should be required (based on 3+ failures in last 10 mins).
      */
     public boolean isCaptchaRequired(String ip) {
-        if (!redisAvailable)
-            return false;
-        try {
-            return Boolean.TRUE.equals(redisTemplate.hasKey(CAPTCHA_KEY + ip));
-        } catch (Exception e) {
-            return false;
-        }
+        long failures = loginAttemptRepo.countByIpAddressAndStatusAndCreatedAtAfter(
+                ip, LoginAttempt.Status.FAILURE, Instant.now().minus(Duration.ofMinutes(10)));
+        return failures >= getCaptchaThreshold();
     }
 
     /**
-     * Record a failed login attempt. Returns the current failure count.
-     * Automatically escalates blocking based on thresholds.
+     * Record a failed login attempt. Returns count in last 1 hour.
      */
-    public long recordFailure(String ip) {
-        return recordFailure(ip, null);
-    }
-
-    /**
-     * Record a failed login attempt. Returns the current failure count.
-     * Automatically escalates blocking based on thresholds.
-     */
-    public long recordFailure(String ip, String username) {
-        if (!redisAvailable)
+    @Transactional
+    public long recordFailure(String ip, String email) {
+        if (isWhitelisted(ip))
             return 0;
 
-        if (isWhitelisted(ip)) {
-            log.info("🛡️ Whitelisted IP {} bypassed limits", ip);
-            return 0;
+        // Đếm số lần thất bại trong 1 giờ qua từ bảng LoginAttempt
+        long failures = loginAttemptRepo.countByIpAddressAndStatusAndCreatedAtAfter(
+                ip, LoginAttempt.Status.FAILURE, Instant.now().minus(Duration.ofHours(1)));
+
+        int max = getMaxAttempts();
+
+        if (failures >= max * 10) { // Ví dụ 50 lần -> Chặn 24h
+            blockIP(ip, 1440, "BRUTE_FORCE_CRITICAL");
+            securityEventService.logIpBlocked(ip, "Critical Brute Force: " + failures + " attempts.");
+        } else if (failures >= max) { // 5 lần -> Chặn theo cấu hình (60p)
+            blockIP(ip, getLockDurationMinutes(), "REPEATED_LOGIN_FAILURE");
+            securityEventService.logBruteForce(ip, "IP blocked after " + failures + " failures.");
         }
 
-        try {
-            // Increment IP failure counter
-            Long ipFails = redisTemplate.opsForValue().increment(IP_FAILURE_KEY + ip);
-            redisTemplate.expire(IP_FAILURE_KEY + ip, 1, TimeUnit.HOURS);
-
-            // Increment user failure counter (if username provided)
-            if (username != null && !username.isEmpty()) {
-                String userKey = USER_FAILURE_KEY + username;
-                redisTemplate.opsForValue().increment(userKey);
-                redisTemplate.expire(userKey, 1, TimeUnit.HOURS);
-            }
-
-            long failures = ipFails != null ? ipFails : 0;
-
-            int max = getMaxAttempts();
-            if (ipFails != null && ipFails >= max) {
-                log.warn("🚨 IP {} crossed soft limit ({}/{}). Still trying?", ip, ipFails, max);
-            }
-
-            if (ipFails != null && ipFails >= max * 2) {
-                log.warn("🚨 IP {} crossed strict limit ({}/{}). Applying HARD BLOCK.", ip, ipFails, max * 2);
-                blockIP(ip, getLockDurationMinutes(), "REPEATED_BRUTEFORCE");
-            }
-
-            // Apply progressive lockout
-            if (failures >= getPermanentBlockThreshold()) {
-                // 50+ failures → block for 24h
-                blockIP(ip, 24 * 60, "BRUTE_FORCE_AUTO_BLOCK_PERMANENT");
-                log.error("🚨 PERMANENT BLOCK: IP {} blocked for 24h ({} failures)", ip, failures);
-                securityEventService.logIpBlocked(ip,
-                        String.format("Permanent block: %d failures in 1h (blocked 24h)", failures));
-            } else if (failures >= max * 4) {
-                // 20+ failures → block for 1h
-                blockIP(ip, 60, "BRUTE_FORCE_AUTO_BLOCK_1H");
-                log.warn("🔴 BLOCK 1H: IP {} ({} failures)", ip, failures);
-                securityEventService.logBruteForce(ip,
-                        String.format("Escalated block: %d failures (blocked 1h)", failures));
-            } else if (failures >= max * 2) {
-                // 10+ failures → block for 5min/dynamic based on lock duration and escalation
-                blockIP(ip, getLockDurationMinutes() * getEscalationMultiplier(), "BRUTE_FORCE_AUTO_BLOCK_MED");
-                log.warn("🟡 BLOCK 5MIN: IP {} ({} failures)", ip, failures);
-                securityEventService.logBruteForce(ip,
-                        String.format("Medium block: %d failures (blocked %dmin)", failures,
-                                getLockDurationMinutes() * getEscalationMultiplier()));
-            } else if (failures >= max) {
-                // Hard block (chặn cứng: 100 years logging) upon Too Many Requests
-                blockIP(ip, 24 * 60 * 365 * 100, "Brute force attempt detected");
-                log.warn("🔴 HARD BLOCK: IP {} ({} failures)", ip, failures);
-                securityEventService.logRateLimit(ip,
-                        String.format("Hard block: %d failures", failures));
-            } else if (failures >= getCaptchaThreshold()) {
-                // 3+ failures → require CAPTCHA
-                redisTemplate.opsForValue().set(CAPTCHA_KEY + ip, "1", 5, TimeUnit.MINUTES);
-                log.info("🔐 CAPTCHA required for IP: {} ({} failures)", ip, failures);
-            }
-
-            return failures;
-        } catch (Exception e) {
-            log.error("Redis error recording failure: {}", e.getMessage());
-            return 0;
-        }
+        return failures;
     }
 
-    /**
-     * Record a successful login — resets failure counters.
-     */
-    public void recordSuccess(String ip, String username) {
-        if (!redisAvailable)
-            return;
-        try {
-            redisTemplate.delete(IP_FAILURE_KEY + ip);
-            redisTemplate.delete(CAPTCHA_KEY + ip);
-            if (username != null) {
-                redisTemplate.delete(USER_FAILURE_KEY + username);
-            }
-            log.debug("✅ Login success, counters reset for IP: {}", ip);
-        } catch (Exception e) {
-            log.error("Redis error recording success: {}", e.getMessage());
-        }
+    public void recordSuccess(String ip, String email) {
+        // Database-backed: Không cần reset thủ công vì we query by time window.
+        log.debug("Login success for IP: {}", ip);
     }
 
-    /**
-     * Manually block an IP for specified duration.
-     */
     public void blockIP(String ip, long durationMinutes, String reason) {
-        if (!redisAvailable)
-            return;
-        try {
-            redisTemplate.opsForValue().set(BLOCKED_KEY + ip, "1", durationMinutes, TimeUnit.MINUTES);
-            blockedIpRepo.save(new BlockedIpHistory(ip, reason != null ? reason : "UNKNOWN"));
-        } catch (Exception e) {
-            log.error("Redis error blocking IP: {}", e.getMessage());
-        }
+        blockedIpRepo.save(new BlockedIpHistory(ip, reason));
+        log.warn("🚨 IP BLOCKED: {} for {} min. Reason: {}", ip, durationMinutes, reason);
     }
 
-    /**
-     * Manually unblock an IP.
-     */
+    @Transactional
     public void unblockIP(String ip) {
-        try {
-            if (redisAvailable) {
-                redisTemplate.delete(BLOCKED_KEY + ip);
-                redisTemplate.delete(IP_FAILURE_KEY + ip);
-                redisTemplate.delete(CAPTCHA_KEY + ip);
+        List<BlockedIpHistory> history = blockedIpRepo.findByIpAddress(ip);
+        for (BlockedIpHistory h : history) {
+            if (!h.getReason().contains("_UNBLOCKED")) {
+                h.setReason(h.getReason() + "_UNBLOCKED");
             }
-
-            // Mark DB records as unblocked
-            java.util.List<BlockedIpHistory> histories = blockedIpRepo.findByIpAddress(ip);
-            boolean updated = false;
-            for (BlockedIpHistory h : histories) {
-                if (h.getReason() != null && !h.getReason().contains("_UNBLOCKED")) {
-                    h.setReason(h.getReason() + "_UNBLOCKED");
-                    updated = true;
-                }
-            }
-            if (updated) {
-                blockedIpRepo.saveAll(histories);
-            }
-
-            log.info("🔓 IP unblocked: {}", ip);
-        } catch (Exception e) {
-            log.error("Error unblocking IP: {}", e.getMessage());
         }
+        blockedIpRepo.saveAll(history);
+        log.info("🔓 IP UNBLOCKED: {}", ip);
     }
 
-    /**
-     * Get current failure count for an IP.
-     */
     public long getFailureCount(String ip) {
-        if (!redisAvailable)
-            return 0;
-        try {
-            String val = redisTemplate.opsForValue().get(IP_FAILURE_KEY + ip);
-            return val != null ? Long.parseLong(val) : 0;
-        } catch (Exception e) {
-            return 0;
-        }
+        return loginAttemptRepo.countByIpAddressAndStatusAndCreatedAtAfter(
+                ip, LoginAttempt.Status.FAILURE, Instant.now().minus(Duration.ofHours(1)));
     }
 
     private boolean isWhitelisted(String ip) {
-        if (ip != null && (ip.startsWith("192.168.") || ip.startsWith("127.") || ip.equals("0:0:0:0:0:0:0:1")
-                || ip.equals("::1"))) {
-            return true;
-        }
-        String whitelists = getIpWhitelist();
-        if (whitelists == null || whitelists.isBlank())
+        if (ip == null)
             return false;
+        if (ip.startsWith("127.") || ip.equals("0:0:0:0:0:0:0:1") || ip.equals("::1"))
+            return true;
+
+        String whitelists = settingService.getSettingValue("defense.ip_whitelist", "");
         for (String wip : whitelists.split(",")) {
             if (wip.trim().equals(ip))
                 return true;
@@ -296,71 +153,42 @@ public class BruteForceProtectionService {
         return false;
     }
 
-    // Removed @PostConstruct to avoid wiping DB on every app startup
     public void emergencyUnblockAll() {
-        log.info("🔥 EMERGENCY UNBLOCK: Clearing all blocked IPs from DB and Redis for testing.");
-        try {
-            blockedIpRepo.deleteAll();
-            if (redisAvailable) {
-                Set<String> keys = redisTemplate.keys(BLOCKED_KEY + "*");
-                if (keys != null && !keys.isEmpty())
-                    redisTemplate.delete(keys);
-
-                Set<String> failKeys = redisTemplate.keys(IP_FAILURE_KEY + "*");
-                if (failKeys != null && !failKeys.isEmpty())
-                    redisTemplate.delete(failKeys);
-            }
-        } catch (Exception e) {
-            log.error("Emergency unblock failed: {}", e.getMessage());
-        }
+        blockedIpRepo.deleteAll();
+        log.info("🔥 EMERGENCY: All IP blocks cleared from Database.");
     }
 
-    /**
-     * Get all currently blocked IPs with their TTL and failure counts.
-     * Used by Admin Security Dashboard.
-     */
     public List<Map<String, Object>> getBlockedIPsDetails() {
         List<Map<String, Object>> result = new ArrayList<>();
-        if (!redisAvailable)
-            return result;
-        try {
-            Set<String> keys = redisTemplate.keys(BLOCKED_KEY + "*");
-            if (keys == null)
-                return result;
-            for (String key : keys) {
-                String ip = key.replace(BLOCKED_KEY, "");
+        // Lấy danh sách IP bị chặn (Distinct)
+        List<String> blockedIps = blockedIpRepo.findAll().stream()
+                .map(BlockedIpHistory::getIpAddress)
+                .distinct().toList();
+
+        for (String ip : blockedIps) {
+            if (isBlocked(ip)) {
                 Map<String, Object> entry = new HashMap<>();
                 entry.put("ip", ip);
-                Long ttl = redisTemplate.getExpire(key, TimeUnit.SECONDS);
-                entry.put("remainingSeconds", ttl != null ? ttl : -1);
+                entry.put("remainingSeconds", getRemainingBlockTTL(ip));
                 entry.put("failureCount", getFailureCount(ip));
-                entry.put("captchaRequired", isCaptchaRequired(ip));
+                entry.put("reason", "Brute Force Protection");
                 result.add(entry);
             }
-        } catch (Exception e) {
-            log.error("Error getting blocked IPs: {}", e.getMessage());
         }
         return result;
     }
 
-    /**
-     * Get remaining block time for an IP (in seconds).
-     */
     public long getRemainingBlockTTL(String ip) {
-        if (!redisAvailable)
-            return 0;
-        try {
-            Long ttl = redisTemplate.getExpire(BLOCKED_KEY + ip, TimeUnit.SECONDS);
-            return ttl != null && ttl > 0 ? ttl : 0;
-        } catch (Exception e) {
-            return 0;
+        Optional<BlockedIpHistory> block = blockedIpRepo.findTopByIpAddressOrderByCreatedAtDesc(ip);
+        if (block.isPresent() && !block.get().getReason().contains("_UNBLOCKED")) {
+            Instant expiry = block.get().getCreatedAt().plus(Duration.ofMinutes(getLockDurationMinutes()));
+            long seconds = Duration.between(Instant.now(), expiry).getSeconds();
+            return seconds > 0 ? seconds : 0;
         }
+        return 0;
     }
 
-    /**
-     * Check if Redis is available.
-     */
     public boolean isRedisAvailable() {
-        return redisAvailable;
+        return false; // Always false now as we use DB
     }
 }

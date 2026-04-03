@@ -13,42 +13,32 @@ import com.myweb.entity.LoginAttempt;
 
 public interface LoginAttemptRepository extends JpaRepository<LoginAttempt, Long> {
 
-        // Recent login attempts (paged) for admin dashboard
         Page<LoginAttempt> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-        // Failed attempts for a specific IP
-        List<LoginAttempt> findByIpAddressAndSuccessFalseAndCreatedAtAfterOrderByCreatedAtDesc(
-                        String ipAddress, Instant after);
-
-        // Failed attempts for a specific username
-        List<LoginAttempt> findByUsernameAndSuccessFalseAndCreatedAtAfterOrderByCreatedAtDesc(
-                        String username, Instant after);
-
-        // Count failed attempts from an IP in the last N hours
+        /**
+         * Counts failed login attempts from an IP after a specific time.
+         * Using the helper method logic for BruteForceProtectionService.
+         */
         @Query("SELECT COUNT(la) FROM LoginAttempt la WHERE la.ipAddress = :ip AND la.success = false AND la.createdAt > :since")
         long countRecentFailures(@Param("ip") String ip, @Param("since") Instant since);
 
-        // Count total failures today
-        @Query("SELECT COUNT(la) FROM LoginAttempt la WHERE la.success = false AND la.createdAt > :since")
-        long countTotalFailuresSince(@Param("since") Instant since);
-
-        // Count total successes today
-        @Query("SELECT COUNT(la) FROM LoginAttempt la WHERE la.success = true AND la.createdAt > :since")
-        long countTotalSuccessesSince(@Param("since") Instant since);
-
-        // Top attacking IPs (most failures)
-        @Query("SELECT la.ipAddress, COUNT(la) as cnt FROM LoginAttempt la WHERE la.success = false AND la.createdAt > :since GROUP BY la.ipAddress ORDER BY cnt DESC")
-        List<Object[]> findTopAttackingIPs(@Param("since") Instant since, Pageable pageable);
-
-        // Top targeted usernames
-        @Query("SELECT la.username, COUNT(la) as cnt FROM LoginAttempt la WHERE la.success = false AND la.createdAt > :since AND la.username IS NOT NULL GROUP BY la.username ORDER BY cnt DESC")
-        List<Object[]> findTopTargetedUsers(@Param("since") Instant since, Pageable pageable);
+        // Alias for the Service signature (Compatibility)
+        default long countByIpAddressAndStatusAndCreatedAtAfter(String ip, LoginAttempt.Status status, Instant since) {
+                return countRecentFailures(ip, since);
+        }
 
         // Search by IP or username
         @Query("SELECT la FROM LoginAttempt la WHERE (la.ipAddress LIKE %:query% OR la.username LIKE %:query%) ORDER BY la.createdAt DESC")
         Page<LoginAttempt> searchByIpOrUsername(@Param("query") String query, Pageable pageable);
 
-        // ═══ ALL-TIME queries (no time filter) for Dashboard display ═══
+        // Standard stats for dashboard
+        @Query("SELECT COUNT(la) FROM LoginAttempt la WHERE la.success = false AND la.createdAt > :since")
+        long countTotalFailuresSince(@Param("since") Instant since);
+
+        @Query("SELECT COUNT(la) FROM LoginAttempt la WHERE la.success = true AND la.createdAt > :since")
+        long countTotalSuccessesSince(@Param("since") Instant since);
+
+        // --- All-time statistics for dashboard ---
 
         @Query("SELECT COUNT(la) FROM LoginAttempt la WHERE la.success = false")
         long countTotalFailuresAllTime();
@@ -56,9 +46,9 @@ public interface LoginAttemptRepository extends JpaRepository<LoginAttempt, Long
         @Query("SELECT COUNT(la) FROM LoginAttempt la WHERE la.success = true")
         long countTotalSuccessesAllTime();
 
-        @Query("SELECT la.ipAddress, COUNT(la) as cnt FROM LoginAttempt la WHERE la.success = false GROUP BY la.ipAddress ORDER BY cnt DESC")
+        @Query("SELECT la.ipAddress, COUNT(la) FROM LoginAttempt la WHERE la.success = false GROUP BY la.ipAddress ORDER BY COUNT(la) DESC")
         List<Object[]> findTopAttackingIPsAllTime(Pageable pageable);
 
-        @Query("SELECT la.username, COUNT(la) as cnt FROM LoginAttempt la WHERE la.success = false AND la.username IS NOT NULL GROUP BY la.username ORDER BY cnt DESC")
+        @Query("SELECT la.username, COUNT(la) FROM LoginAttempt la WHERE la.success = false GROUP BY la.username ORDER BY COUNT(la) DESC")
         List<Object[]> findTopTargetedUsersAllTime(Pageable pageable);
 }

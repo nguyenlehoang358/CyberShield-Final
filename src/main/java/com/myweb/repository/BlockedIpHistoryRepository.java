@@ -1,5 +1,8 @@
 package com.myweb.repository;
 
+import java.util.Optional;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,5 +17,10 @@ public interface BlockedIpHistoryRepository extends JpaRepository<BlockedIpHisto
     @Query("SELECT b FROM BlockedIpHistory b WHERE b.ipAddress LIKE %:query% OR b.reason LIKE %:query% ORDER BY b.createdAt DESC")
     Page<BlockedIpHistory> searchByIpOrReason(@Param("query") String query, Pageable pageable);
 
-    java.util.List<BlockedIpHistory> findByIpAddress(String ipAddress);
+    List<BlockedIpHistory> findByIpAddress(String ipAddress);
+
+    /**
+     * Get the latest block record for an IP address.
+     */
+    Optional<BlockedIpHistory> findTopByIpAddressOrderByCreatedAtDesc(String ipAddress);
 }
