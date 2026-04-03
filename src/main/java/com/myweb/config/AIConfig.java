@@ -1,6 +1,8 @@
 package com.myweb.config;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,18 +11,19 @@ import org.springframework.context.annotation.Configuration;
 
 import com.myweb.service.SystemSettingService;
 
+import dev.langchain4j.data.embedding.Embedding;
+import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
+import dev.langchain4j.model.output.Response;
 
 /**
  * AI / LLM Configuration
  *
  * Configures:
  * - Ollama Chat Model (local LLM for AI Assistant + Security Advisor)
- * - Embedding Model (all-MiniLM-L6-v2, runs locally via ONNX)
- *
- * Ollama is expected to run at http://localhost:11434
- * (or via Docker at http://ollama:11434)
+ * - MOCK Embedding Model (To save memory on Render Free)
  */
 @Configuration
 public class AIConfig {
@@ -36,9 +39,6 @@ public class AIConfig {
     /**
      * Ollama Chat Model — connects to local Ollama server.
      * Used by AI Assistant (chatbot) and Security Advisor.
-     *
-     * If Ollama is not running, this bean will still be created
-     * but calls will fail gracefully at the service layer.
      */
     @Bean
     public ChatLanguageModel chatLanguageModel() {
@@ -60,18 +60,23 @@ public class AIConfig {
     }
 
     /**
-     * Local Embedding Model — all-MiniLM-L6-v2 (ONNX).
-     * Runs entirely in-process, no external dependencies.
-     * Output dimension: 384
-     *
-     * Used for:
-     * - Converting user questions to vectors
-     * - Converting LAB documents to vectors for similarity search
+     * MOCK Embedding Model
+     * Trả về vector ảo để tiết kiệm RAM, giúp deploy lên Render thành công.
      */
-    // @Bean
-    // public EmbeddingModel embeddingModel() {
-    // log.info("📐 Initializing local embedding model: all-MiniLM-L6-v2 (384
-    // dimensions)");
-    // return new AllMiniLmL6V2EmbeddingModel();
-    // }
+    @Bean
+    public EmbeddingModel embeddingModel() {
+        System.out.println("⚠️ MOCK EMBEDDING MODEL IS RUNNING (To save memory on Render Free) ⚠️");
+
+        return new EmbeddingModel() {
+            @Override
+            public Response<List<Embedding>> embedAll(List<TextSegment> textSegments) {
+                // Trả về các vector ảo (0.0) để đánh lừa Spring Boot
+                List<Embedding> mockEmbeddings = new ArrayList<>();
+                for (int i = 0; i < textSegments.size(); i++) {
+                    mockEmbeddings.add(new Embedding(new float[] { 0.0f, 0.0f }));
+                }
+                return Response.from(mockEmbeddings);
+            }
+        };
+    }
 }
