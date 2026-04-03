@@ -116,10 +116,12 @@ public class AuthController {
             return ResponseEntity.ok(response);
 
         } catch (BadCredentialsException e) {
-            // 5. Wrong password → record failure with progressive lockout
-            long failures = bruteForceService.recordFailure(clientIp, email);
+            // 5. FIRST log the failure into LoginAttempt table!
             loginAttemptService.logFailure(clientIp, email, "BAD_CREDENTIALS", userAgent);
-            log.warn("❌ Login failed ({}x): {} from IP {}", failures, email, clientIp);
+
+            // 6. THEN count and record (Now the database has the record we just saved)
+            long failures = bruteForceService.recordFailure(clientIp, email);
+            log.warn("❌ Login failed (Total {}x): {} from IP {}", failures, email, clientIp);
 
             // Build informative error response
             boolean nowBlocked = bruteForceService.isBlocked(clientIp);
