@@ -89,9 +89,9 @@ spring:
 
 server:
   address: 0.0.0.0
-  port: 8443
+  port: ${PORT:10000}
   ssl:
-    enabled: ${SSL_ENABLED:true}
+    enabled: false
     key-store: classpath:keystore.p12
     key-store-password: ${SSL_KEYSTORE_PASSWORD:password}
     key-store-type: PKCS12
