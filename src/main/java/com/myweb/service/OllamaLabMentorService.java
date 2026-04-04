@@ -16,9 +16,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class OllamaLabMentorService {
+
+    private static final Logger log = LoggerFactory.getLogger(OllamaLabMentorService.class);
 
     // Đã xóa bỏ hoàn toàn Gemini API Key để tránh lỗi startup
 
@@ -97,12 +101,18 @@ public class OllamaLabMentorService {
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
         try {
-            JsonNode response = restTemplate.postForObject(ollamaBaseUrl + "/api/generate", entity, JsonNode.class);
+            // Chuẩn hóa URL: Loại bỏ dấu gạch chéo ở cuối nết có
+            String url = ollamaBaseUrl.endsWith("/") ? ollamaBaseUrl.substring(0, ollamaBaseUrl.length() - 1)
+                    : ollamaBaseUrl;
+            url += "/api/generate";
+
+            JsonNode response = restTemplate.postForObject(url, entity, JsonNode.class);
             if (response != null && response.has("response")) {
                 return Map.of("reply", response.get("response").asText());
             }
         } catch (Exception e) {
-            return Map.of("reply", "⚠️ Lỗi kết nối Ollama");
+            log.error("💥 Ollama Connection Error: {}", e.getMessage());
+            return Map.of("reply", "⚠️ Lỗi kết nối Ollama: " + e.getMessage());
         }
         return Map.of("reply", "🤖 Không có phản hồi");
     }
