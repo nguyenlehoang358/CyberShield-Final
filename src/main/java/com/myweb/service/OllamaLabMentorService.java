@@ -75,19 +75,29 @@ public class OllamaLabMentorService {
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
         try {
-            log.info("🌟 Gọi Gemini AI (Cloud Mode)...");
+            log.info("🌟 Gọi Gemini AI (Cloud Mode) với Key dài: {}", geminiApiKey.length());
             JsonNode response = restTemplate.postForObject(geminiUrl, entity, JsonNode.class);
+
+            log.info("📡 Raw Gemini Response: {}", response);
+
             if (response != null && response.has("candidates")) {
                 JsonNode candidate = response.get("candidates").get(0);
                 if (candidate != null && candidate.has("content")) {
-                    String reply = candidate.get("content").get("parts").get(0).get("text").asText();
-                    return Map.of("reply", reply);
+                    JsonNode parts = candidate.get("content").get("parts");
+                    if (parts != null && parts.isArray() && parts.size() > 0) {
+                        String reply = parts.get(0).get("text").asText();
+                        return Map.of("reply", reply);
+                    }
                 }
             }
-            return Map.of("reply", "⚠️ Gemini trả về dữ liệu không hợp lệ.");
+            log.error("🛑 Gemini structure invalid: {}", response);
+            return Map.of("reply", "⚠️ Cấu hình Gemini trả về không khớp.");
+        } catch (org.springframework.web.client.HttpClientErrorException ice) {
+            log.error("❌ Google AI API Error: {} - Content: {}", ice.getStatusCode(), ice.getResponseBodyAsString());
+            return Map.of("reply", "⚠️ Lỗi Google AI: " + ice.getStatusCode());
         } catch (Exception e) {
-            log.error("💥 Gemini Error: {}", e.getMessage());
-            return Map.of("reply", "⚠️ Lỗi kết nối Gemini: " + e.getMessage());
+            log.error("💥 Critical Gemini Crash: {}", e.getMessage(), e);
+            return Map.of("reply", "⚠️ Lỗi hệ thống AI: " + e.getMessage());
         }
     }
 
