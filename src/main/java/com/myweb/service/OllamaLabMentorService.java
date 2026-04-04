@@ -90,6 +90,10 @@ public class OllamaLabMentorService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        // THÊM: Bỏ qua trang cảnh báo của Ngrok để backend nhận JSON trực tiếp
+        headers.set("ngrok-skip-browser-warning", "true");
+        headers.set("bypass-tunnel-reminder", "true");
+
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
         try {
