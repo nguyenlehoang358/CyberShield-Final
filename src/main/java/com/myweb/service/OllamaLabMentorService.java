@@ -102,16 +102,30 @@ public class OllamaLabMentorService {
 
         try {
             // Chuẩn hóa URL: Loại bỏ dấu gạch chéo ở cuối nết có
-            String url = ollamaBaseUrl.endsWith("/") ? ollamaBaseUrl.substring(0, ollamaBaseUrl.length() - 1)
-                    : ollamaBaseUrl;
-            url += "/api/generate";
+            String cleanBaseUrl = ollamaBaseUrl.trim();
+            if (cleanBaseUrl.endsWith("/")) {
+                cleanBaseUrl = cleanBaseUrl.substring(0, cleanBaseUrl.length() - 1);
+            }
+            String url = cleanBaseUrl + "/api/generate";
+
+            log.info("🚀 AI Request to Ollama: {}", url);
+            log.debug("Payload: {}", requestBody);
 
             JsonNode response = restTemplate.postForObject(url, entity, JsonNode.class);
+
             if (response != null && response.has("response")) {
-                return Map.of("reply", response.get("response").asText());
+                String reply = response.get("response").asText();
+                log.info("✅ Ollama response received ({} chars)", reply.length());
+                return Map.of("reply", reply);
+            } else {
+                log.error("🛑 Ollama returned null or invalid structure: {}", response);
+                return Map.of("reply", "⚠️ Ollama không phản hồi nội dung.");
             }
+        } catch (org.springframework.web.client.HttpClientErrorException hcee) {
+            log.error("❌ HTTP Client Error ({}): {}", hcee.getStatusCode(), hcee.getResponseBodyAsString());
+            return Map.of("reply", "⚠️ Lỗi Ngrok/Client: " + hcee.getMessage());
         } catch (Exception e) {
-            log.error("💥 Ollama Connection Error: {}", e.getMessage());
+            log.error("💥 Ollama Global Error: {}", e.getMessage(), e);
             return Map.of("reply", "⚠️ Lỗi kết nối Ollama: " + e.getMessage());
         }
         return Map.of("reply", "🤖 Không có phản hồi");
