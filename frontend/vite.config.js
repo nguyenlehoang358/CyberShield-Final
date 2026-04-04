@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig(({ mode }) => {
   // Load env file from the current directory
   const env = loadEnv(mode, process.cwd(), '');
-  
+
   return {
     plugins: [react()],
     server: {
@@ -35,6 +35,23 @@ export default defineConfig(({ mode }) => {
         clientPort: env.VITE_NGROK_BACKEND_URL ? 443 : undefined
       },
       host: true,
+    },
+    build: {
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('react')) return 'vendor-react';
+              if (id.includes('axios')) return 'vendor-axios';
+              return 'vendor'; // Tách các thư viện bên thứ 3
+            }
+            if (id.includes('src/pages/Lab')) {
+              return 'lab-pages'; // Tách riêng phần Lab nặng nhất
+            }
+          }
+        }
+      }
     }
   }
 })
