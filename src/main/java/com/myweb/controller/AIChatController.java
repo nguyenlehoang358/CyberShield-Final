@@ -128,31 +128,34 @@ public class AIChatController {
     }
 
     /**
-     * POST /api/ai/lab-mentor
-     * Use local Ollama AI as a Lab Mentor.
+     * POST /api/ai/lab/chat
+     * AI Lab Mentor with Gemini Cloud Support (or local Ollama failover)
      */
-    @PostMapping("/lab-mentor")
-    public ResponseEntity<?> labMentor(@RequestBody LabChatRequest request,
+    @PostMapping("/lab/chat")
+    public ResponseEntity<?> labChat(@RequestBody LabChatRequest request,
             HttpServletRequest httpRequest) {
-        String clientIp = getClientIp(httpRequest);
+        try {
+            String clientIp = getClientIp(httpRequest);
 
-        if (!rateLimiter.isAllowed(clientIp)) {
-            return ResponseEntity.status(429)
-                    .body(Map.of("error", "Quá nhiều yêu cầu. Vui lòng thử lại sau.", "status", 429));
+            if (!rateLimiter.isAllowed(clientIp)) {
+                return ResponseEntity.status(429)
+                        .body(Map.of("error", "Quá nhiều yêu cầu. Vui lòng thử lại sau.", "status", 429));
+            }
+
+            if (request == null || request.message() == null || request.message().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Message cannot be empty", "status", 400));
+            }
+
+            // Gọi AI Mentor Service (Gemini/Ollama)
+            Map<String, Object> aiResponse = ollamaLabMentorService.generateMentorResponse(request);
+            return ResponseEntity.ok(aiResponse);
+
+        } catch (Exception e) {
+            log.error("💥 Controller AI Error: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(Map.of(
+                    "reply", "⚠️ Lỗi hệ thống Controller: " + e.getMessage(),
+                    "error", true));
         }
-
-        if (request.message() == null || request.message().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Message cannot be empty", "status", 400));
-        }
-
-        // Gọi Ollama Mentor Service
-        Map<String, Object> aiResponse = ollamaLabMentorService.generateMentorResponse(request);
-
-        // Merge with metadata
-        Map<String, Object> finalResponse = new java.util.HashMap<>(aiResponse);
-        finalResponse.put("model", ollamaModel);
-
-        return ResponseEntity.ok(finalResponse);
     }
 
     private String sanitizeInput(String input) {
