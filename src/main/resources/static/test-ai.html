@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShield AI Test - Backend Mode</title>
+    <style>
+        body { font-family: sans-serif; background: #0f172a; color: white; display: flex; flex-direction: column; align-items: center; padding: 50px; }
+        .chat-box { width: 100%; max-width: 600px; background: #1e293b; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        input { width: 100%; padding: 12px; margin-top: 10px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; margin-top: 10px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        #response { margin-top: 20px; padding: 15px; background: #334155; border-radius: 8px; min-height: 50px; white-space: pre-wrap; line-height: 1.6; }
+        .loader { display: none; color: #fbbf24; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🛡️ Lab Mentor AI Tester (Backend Only)</h1>
+    <div class="chat-box">
+        <div id="response">Kết quả sẽ hiển thị ở đây...</div>
+        <div class="loader" id="loader">Đang hỏi AI, vui lòng chờ...</div>
+        <input type="text" id="userInput" placeholder="Nhập câu hỏi bảo mật (VD: SQL Injection là gì? nhung co dâu nhe )...">
+        <button onclick="sendChat()">Gửi trực tiếp tới Backend</button>
+    </div>
+
+    <script>
+        async function sendChat() {
+            const input = document.getElementById('userInput');
+            const responseDiv = document.getElementById('response');
+            const loader = document.getElementById('loader');
+            
+            if(!input.value.trim()) return;
+
+            responseDiv.innerText = "";
+            loader.style.display = "block";
+
+            try {
+                const res = await fetch('/api/lab/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        message: input.value,
+                        labContext: "Backend Diagnostic Test Mode" 
+                    })
+                });
+
+                const data = await res.json();
+                responseDiv.innerText = data.reply || "Lỗi: Không nhận được phản hồi từ AI.";
+            } catch (err) {
+                responseDiv.innerText = "❌ Lỗi kết nối tới Endpoint Backend: " + err.message;
+            } finally {
+                loader.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

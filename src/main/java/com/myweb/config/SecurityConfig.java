@@ -66,67 +66,70 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
 
-            // FIX: CORS phải được khai báo trước tất cả các filter khác
-            // Spring Security sẽ tự xử lý OPTIONS preflight trước khi vào các filter bên dưới
-            .cors(c -> c.configurationSource(corsConfigurationSource()))
+                // FIX: CORS phải được khai báo trước tất cả các filter khác
+                // Spring Security sẽ tự xử lý OPTIONS preflight trước khi vào các filter bên
+                // dưới
+                .cors(c -> c.configurationSource(corsConfigurationSource()))
 
-            .headers(headers -> headers
-                .contentSecurityPolicy(csp -> csp.policyDirectives(
-                    "default-src 'self'; " +
-                    "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-                    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-                    "font-src 'self' data: https://fonts.gstatic.com; " +
-                    "img-src 'self' data: blob: https:; " +
-                    "connect-src 'self' http://localhost:5173 https://cybershield-prod.vercel.app https://cybershield-final-chi.vercel.app https://generativelanguage.googleapis.com https://accounts.google.com https://github.com https://facebook.com; " +
-                    "frame-ancestors 'none'; " +
-                    "form-action 'self' https://accounts.google.com https://github.com https://facebook.com; " +
-                    "object-src 'none';")))
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(
+                                "default-src 'self'; " +
+                                        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+                                        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+                                        "font-src 'self' data: https://fonts.gstatic.com; " +
+                                        "img-src 'self' data: blob: https:; " +
+                                        "connect-src 'self' http://localhost:5173 https://cybershield-prod.vercel.app https://cybershield-final-chi.vercel.app https://generativelanguage.googleapis.com https://accounts.google.com https://github.com https://facebook.com; "
+                                        +
+                                        "frame-ancestors 'none'; " +
+                                        "form-action 'self' https://accounts.google.com https://github.com https://facebook.com; "
+                                        +
+                                        "object-src 'none';")))
 
-            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/health").permitAll()
-                .requestMatchers(
-                    "/", "/index.html", "/login.html", "/dashboard.html",
-                    "/css/**", "/js/**", "/images/**", "/oauth2/**",
-                    "/login/**", "/error", "/static/**", "/assets/**",
-                    "/*.js", "/*.css", "/*.png", "/*.jpg")
-                .permitAll()
-                .requestMatchers("/ws/**", "/ws").permitAll()
-                .requestMatchers("/actuator/**").hasRole("ADMIN")
-                .requestMatchers(
-                    "/swagger-ui/**", "/swagger-ui.html",
-                    "/v3/api-docs/**", "/v3/api-docs")
-                .permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/public/**").permitAll()
-                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/contact").permitAll()
-                .requestMatchers("/api/ai/chat", "/api/ai/status", "/api/ai/health").permitAll()
-                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/blog/**").permitAll()
-                .requestMatchers("/api/lab/**").permitAll()
-                .requestMatchers("/api/**").authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/health").permitAll()
+                        .requestMatchers(
+                                "/", "/index.html", "/login.html", "/dashboard.html",
+                                "/css/**", "/js/**", "/images/**", "/oauth2/**",
+                                "/login/**", "/error", "/static/**", "/assets/**",
+                                "/*.js", "/*.css", "/*.png", "/*.jpg")
+                        .permitAll()
+                        .requestMatchers("/ws/**", "/ws").permitAll()
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                "/swagger-ui/**", "/swagger-ui.html",
+                                "/v3/api-docs/**", "/v3/api-docs")
+                        .permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/public/**", "/test-ai.html").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/contact").permitAll()
+                        .requestMatchers("/api/ai/chat", "/api/ai/status", "/api/ai/health").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/blog/**").permitAll()
+                        .requestMatchers("/api/lab/**").permitAll()
+                        .requestMatchers("/api/**").authenticated())
 
-            .oauth2Login(oauth2 -> oauth2
-                .authorizationEndpoint(authorization -> authorization
-                    .baseUri("/oauth2/authorization")
-                    .authorizationRequestRepository(cookieAuthorizationRequestRepository))
-                .userInfoEndpoint(userInfo -> userInfo
-                    .userService(customOAuth2UserService))
-                .successHandler(oAuth2LoginSuccessHandler)
-                .failureUrl("/login.html?error=oauth2_failed"))
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(authorization -> authorization
+                                .baseUri("/oauth2/authorization")
+                                .authorizationRequestRepository(cookieAuthorizationRequestRepository))
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureUrl("/login.html?error=oauth2_failed"))
 
-            .exceptionHandling(ex -> ex
-                .accessDeniedHandler(this::handleAccessDenied)
-                .authenticationEntryPoint(this::handleUnauthorized))
+                .exceptionHandling(ex -> ex
+                        .accessDeniedHandler(this::handleAccessDenied)
+                        .authenticationEntryPoint(this::handleUnauthorized))
 
-            .authenticationProvider(authenticationProvider())
+                .authenticationProvider(authenticationProvider())
 
-            // FIX: ipBlacklistFilter phải đứng SAU CorsFilter (Spring tự thêm)
-            // Thứ tự đúng: CorsFilter (auto) → IpBlacklistFilter → JwtAuthFilter
-            .addFilterBefore(ipBlacklistFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                // FIX: ipBlacklistFilter phải đứng SAU CorsFilter (Spring tự thêm)
+                // Thứ tự đúng: CorsFilter (auto) → IpBlacklistFilter → JwtAuthFilter
+                .addFilterBefore(ipBlacklistFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -155,20 +158,18 @@ public class SecurityConfig {
 
         // FIX: Danh sách origin rõ ràng, không trailing slash lẫn lộn
         config.setAllowedOriginPatterns(Arrays.asList(
-            "http://localhost:5173",
-            "http://localhost:3000",
-            "http://192.168.*.*",
-            "http://127.0.0.1:5173",
-            "https://*.ngrok-free.app",
-            "https://*.ngrok-free.dev",
-            "https://tyler-nonexemplary-attractionally.ngrok-free.dev",
-            "https://cybershield-prod.vercel.app",
-            "https://cybershield-final-chi.vercel.app"
-        ));
+                "http://localhost:5173",
+                "http://localhost:3000",
+                "http://192.168.*.*",
+                "http://127.0.0.1:5173",
+                "https://*.ngrok-free.app",
+                "https://*.ngrok-free.dev",
+                "https://tyler-nonexemplary-attractionally.ngrok-free.dev",
+                "https://cybershield-prod.vercel.app",
+                "https://cybershield-final-chi.vercel.app"));
 
         config.setAllowedMethods(Arrays.asList(
-            "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"
-        ));
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"));
 
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization", "Content-Type"));
@@ -191,7 +192,7 @@ public class SecurityConfig {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(
-            Map.of("error", "Bạn không có quyền truy cập", "status", 403)));
+                Map.of("error", "Bạn không có quyền truy cập", "status", 403)));
     }
 
     @SuppressWarnings("unused")
@@ -203,6 +204,6 @@ public class SecurityConfig {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(
-            Map.of("error", "Vui lòng đăng nhập", "status", 401)));
+                Map.of("error", "Vui lòng đăng nhập", "status", 401)));
     }
 }

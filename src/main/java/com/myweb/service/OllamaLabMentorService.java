@@ -32,6 +32,9 @@ public class OllamaLabMentorService {
     @Value("${app.ai.ollama.model:qwen2.5:0.5b}")
     private String ollamaModel;
 
+    @Value("${google.ai.api-key:}")
+    private String geminiApiKey;
+
     private final RestTemplate restTemplate;
     private final ObjectMapper mapper;
 
@@ -44,16 +47,52 @@ public class OllamaLabMentorService {
      * 🤖 PHẦN 1: CHAT VỚI OLLAMA
      */
     public Map<String, Object> generateMentorResponse(LabChatRequest request) {
-        String systemPrompt = "Bạn là CyberShield Lab Mentor. Hãy hướng dẫn ngắn gọn, không giải thích dài dòng. Trả lời bằng Markdown. Ngữ cảnh: "
+        String systemPrompt = "Bạn là CyberShield Lab Mentor. Hãy hướng dẫn ngắn gọn, không giải thích dài dòng. Trả lời bằng tiếng Việt, định dạng Markdown. Ngữ cảnh: "
                 + (request.labContext() != null ? request.labContext() : "Trống");
-
         String fullPrompt = systemPrompt + "\n\nCâu hỏi học viên: " + request.message();
+        return callAI(fullPrompt);
+    }
 
-        return callOllama(fullPrompt);
+    private Map<String, Object> callAI(String prompt) {
+        if (geminiApiKey != null && !geminiApiKey.isBlank()) {
+            return callGemini(prompt);
+        }
+        return callOllama(prompt);
+    }
+
+    private Map<String, Object> callGemini(String prompt) {
+        String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
+                + geminiApiKey;
+        Map<String, Object> requestBody = new HashMap<>();
+        List<Map<String, Object>> contents = new ArrayList<>();
+        Map<String, Object> contentPart = new HashMap<>();
+        contentPart.put("parts", List.of(Map.of("text", prompt)));
+        contents.add(contentPart);
+        requestBody.put("contents", contents);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+        try {
+            log.info("🌟 Gọi Gemini AI (Cloud Mode)...");
+            JsonNode response = restTemplate.postForObject(geminiUrl, entity, JsonNode.class);
+            if (response != null && response.has("candidates")) {
+                JsonNode candidate = response.get("candidates").get(0);
+                if (candidate != null && candidate.has("content")) {
+                    String reply = candidate.get("content").get("parts").get(0).get("text").asText();
+                    return Map.of("reply", reply);
+                }
+            }
+            return Map.of("reply", "⚠️ Gemini trả về dữ liệu không hợp lệ.");
+        } catch (Exception e) {
+            log.error("💥 Gemini Error: {}", e.getMessage());
+            return Map.of("reply", "⚠️ Lỗi kết nối Gemini: " + e.getMessage());
+        }
     }
 
     /**
-     * 🤖 PHẦN 2: GỢI Ý PAYLOAD (ĐÃ CHUYỂN SANG DÙNG OLLAMA)
+     * 🤖 PHẦN 2: GỢI Ý PAYLOAD
      * Thay thế Gemini bằng Qwen để tránh lỗi thiếu API Key.
      */
     @Cacheable(value = "labSuggestions", key = "#labType + '_' + (#userInput != null ? #userInput : '')")
