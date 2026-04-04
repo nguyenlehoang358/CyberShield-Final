@@ -61,7 +61,7 @@ public class OllamaLabMentorService {
     }
 
     private Map<String, Object> callGemini(String prompt) {
-        String geminiUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key="
+        String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key="
                 + geminiApiKey;
         Map<String, Object> requestBody = new HashMap<>();
         List<Map<String, Object>> contents = new ArrayList<>();
