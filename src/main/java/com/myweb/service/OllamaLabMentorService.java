@@ -61,42 +61,35 @@ public class OllamaLabMentorService {
     }
 
     private Map<String, Object> callGemini(String prompt) {
-        String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key="
+        String geminiUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key="
                 + geminiApiKey;
-        Map<String, Object> requestBody = new HashMap<>();
-        List<Map<String, Object>> contents = new ArrayList<>();
-        Map<String, Object> contentPart = new HashMap<>();
-        contentPart.put("parts", List.of(Map.of("text", prompt)));
-        contents.add(contentPart);
-        requestBody.put("contents", contents);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-
         try {
-            log.info("🌟 Gọi Gemini AI (Cloud Mode) với Key dài: {}", geminiApiKey.length());
-            JsonNode response = restTemplate.postForObject(geminiUrl, entity, JsonNode.class);
+            log.info("🌟 Gọi Gemini AI Cloud (Stable Mode)...");
+            Map<String, Object> textPart = new java.util.HashMap<>();
+            textPart.put("text", prompt);
+            Map<String, Object> contentPart = new java.util.HashMap<>();
+            contentPart.put("parts", java.util.List.of(textPart));
+            Map<String, Object> requestBody = new java.util.HashMap<>();
+            requestBody.put("contents", java.util.List.of(contentPart));
 
-            log.info("📡 Raw Gemini Response: {}", response);
+            JsonNode response = restTemplate.postForObject(geminiUrl, requestBody, JsonNode.class);
 
             if (response != null && response.has("candidates")) {
                 JsonNode candidate = response.get("candidates").get(0);
                 if (candidate != null && candidate.has("content")) {
                     JsonNode parts = candidate.get("content").get("parts");
                     if (parts != null && parts.isArray() && parts.size() > 0) {
-                        String reply = parts.get(0).get("text").asText();
-                        return Map.of("reply", reply);
+                        return Map.of("reply", parts.get(0).get("text").asText());
                     }
                 }
             }
             log.error("🛑 Gemini structure invalid: {}", response);
-            return Map.of("reply", "⚠️ Cấu hình Gemini trả về không khớp.");
+            return Map.of("reply", "⚠️ Dữ liệu Gemini trả về không đúng cấu trúc.");
         } catch (org.springframework.web.client.HttpClientErrorException ice) {
             log.error("❌ Google AI API Error: {} - Content: {}", ice.getStatusCode(), ice.getResponseBodyAsString());
-            return Map.of("reply", "⚠️ Lỗi Google AI: " + ice.getStatusCode());
+            return Map.of("reply", "⚠️ Lỗi Google AI (" + ice.getStatusCode() + ")");
         } catch (Exception e) {
-            log.error("💥 Critical Gemini Crash: {}", e.getMessage(), e);
+            log.error("💥 Gemini Crash: {}", e.getMessage(), e);
             return Map.of("reply", "⚠️ Lỗi hệ thống AI: " + e.getMessage());
         }
     }
