@@ -128,7 +128,6 @@ public class OllamaLabMentorService {
             log.error("💥 Ollama Global Error: {}", e.getMessage(), e);
             return Map.of("reply", "⚠️ Lỗi kết nối Ollama: " + e.getMessage());
         }
-        return Map.of("reply", "🤖 Không có phản hồi");
     }
 
     private List<String> fallbackPayloads(String labType) {
