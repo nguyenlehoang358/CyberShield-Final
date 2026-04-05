@@ -24,8 +24,6 @@ public class OllamaLabMentorService {
 
     private static final Logger log = LoggerFactory.getLogger(OllamaLabMentorService.class);
 
-    // Đã xóa bỏ hoàn toàn Gemini API Key để tránh lỗi startup
-
     @Value("${app.ai.ollama.base-url:http://127.0.0.1:11434}")
     private String ollamaBaseUrl;
 
@@ -54,43 +52,40 @@ public class OllamaLabMentorService {
     }
 
     private Map<String, Object> callAI(String prompt) {
+        // Ưu tiên dùng Hugging Face (Dễ chạy trên Render nhất)
         if (geminiApiKey != null && !geminiApiKey.isBlank()) {
-            return callGemini(prompt);
+            return callHuggingFace(prompt);
         }
         return callOllama(prompt);
     }
 
-    private Map<String, Object> callGemini(String prompt) {
-        String geminiUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key="
-                + geminiApiKey;
+    private Map<String, Object> callHuggingFace(String prompt) {
+        // Model Qwen rực rỡ, mạnh mẽ và miễn phí
+        String hfUrl = "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-7B-Instruct";
+        
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("inputs", prompt);
+        requestBody.put("parameters", Map.of("max_new_tokens", 500, "return_full_text", false));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + geminiApiKey); // Assuming you put HF Token here
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
         try {
-            log.info("🌟 Gọi Gemini AI Cloud (Stable Mode)...");
-            Map<String, Object> textPart = new java.util.HashMap<>();
-            textPart.put("text", prompt);
-            Map<String, Object> contentPart = new java.util.HashMap<>();
-            contentPart.put("parts", java.util.List.of(textPart));
-            Map<String, Object> requestBody = new java.util.HashMap<>();
-            requestBody.put("contents", java.util.List.of(contentPart));
-
-            JsonNode response = restTemplate.postForObject(geminiUrl, requestBody, JsonNode.class);
-
-            if (response != null && response.has("candidates")) {
-                JsonNode candidate = response.get("candidates").get(0);
-                if (candidate != null && candidate.has("content")) {
-                    JsonNode parts = candidate.get("content").get("parts");
-                    if (parts != null && parts.isArray() && parts.size() > 0) {
-                        return Map.of("reply", parts.get(0).get("text").asText());
-                    }
-                }
+            log.info("🌟 Gọi AI via Hugging Face Cloud (24/7 Mode)...");
+            JsonNode response = restTemplate.postForObject(hfUrl, entity, JsonNode.class);
+            
+            if (response != null && response.isArray()) {
+                String reply = response.get(0).get("generated_text").asText();
+                return Map.of("reply", reply);
             }
-            log.error("🛑 Gemini structure invalid: {}", response);
-            return Map.of("reply", "⚠️ Dữ liệu Gemini trả về không đúng cấu trúc.");
-        } catch (org.springframework.web.client.HttpClientErrorException ice) {
-            log.error("❌ Google AI API Error: {} - Content: {}", ice.getStatusCode(), ice.getResponseBodyAsString());
-            return Map.of("reply", "⚠️ Lỗi Google AI (" + ice.getStatusCode() + ")");
+            return Map.of("reply", "⚠️ AI trả về dữ liệu trống.");
         } catch (Exception e) {
-            log.error("💥 Gemini Crash: {}", e.getMessage(), e);
-            return Map.of("reply", "⚠️ Lỗi hệ thống AI: " + e.getMessage());
+            log.error("💥 HF Error: {}", e.getMessage());
+            // Fallback gợi ý người dùng kiểm tra Token
+            return Map.of("reply", "⚠️ Lỗi AI Cloud: " + e.getMessage() + ". Hãy đảm bảo HF_TOKEN chính xác.");
         }
     }
 
