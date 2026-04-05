@@ -9,6 +9,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -44,9 +45,19 @@ public class OllamaLabMentorService {
      * 🤖 PHẦN 1: CHAT VỚI OLLAMA
      */
     public Map<String, Object> generateMentorResponse(LabChatRequest request) {
-        String systemPrompt = "Bạn là CyberShield Lab Mentor. Hãy hướng dẫn ngắn gọn, không giải thích dài dòng. Trả lời bằng tiếng Việt, định dạng Markdown. Ngữ cảnh: "
-                + (request.labContext() != null ? request.labContext() : "Trống");
-        String fullPrompt = systemPrompt + "\n\nCâu hỏi học viên: " + request.message();
+        String systemPrompt = """
+                Bạn là CyberShield Lab Mentor, một chuyên gia an ninh mạng kỳ cựu.
+                HƯỚNG DẪN:
+                1. Trả lời ngắn gọn, định dạng Markdown, ngôn ngữ Tiếng Việt.
+                2. Nếu người dùng yêu cầu thực hiện hành động (Mã hoá, Giải mã, Hash, hoặc Sinh payload), ngoài việc trả lời văn bản, bạn PHẢI kẹp thêm tag sau vào cuối câu trả lời:
+                   <!--FILL_FORM:giá_trị_cần_điền-->
+                   Ví dụ: "Kết quả mã hóa AES là: abcxyz <!--FILL_FORM:abcxyz-->"
+                   Ví dụ: "Payload bypass XSS: <script>... <!--FILL_FORM:<script>...-->"
+                3. Chỉ sử dụng tag FILL_FORM khi thực sự có giá trị cần điền vào input của Lab.
+                Ngữ cảnh Lab: %s (ID: %s)
+                """.formatted(request.labContext() != null ? request.labContext() : "Trống", request.labId() != null ? request.labId() : "N/A");
+
+        String fullPrompt = systemPrompt + "\n\nHọc viên hỏi: " + request.message();
         return callAI(fullPrompt);
     }
 
@@ -96,12 +107,12 @@ public class OllamaLabMentorService {
             }
             log.error("🛑 HF Unknown response: {}", response);
             return Map.of("reply", "⚠️ AI trả về dữ liệu không nhận diện được.");
-        } catch (org.springframework.web.client.HttpClientErrorException ice) {
-            log.error("❌ HF API Error: {} - {}", ice.getStatusCode(), ice.getResponseBodyAsString());
-            return Map.of("reply", "⚠️ Lỗi HF (" + ice.getStatusCode() + "): " + ice.getResponseBodyAsString());
+        } catch (HttpClientErrorException ice) {
+            log.error("❌ Cloud AI API Error: {} - {}", ice.getStatusCode(), ice.getResponseBodyAsString());
+            return Map.of("reply", "⚠️ Lỗi Cloud (" + ice.getStatusCode() + "): " + ice.getResponseBodyAsString());
         } catch (Exception e) {
-            log.error("💥 HF Error: {}", e.getMessage());
-            return Map.of("reply", "⚠️ Lỗi AI Cloud: " + e.getMessage());
+            log.error("💥 Cloud AI General Error: {}", e.getMessage());
+            return Map.of("reply", "⚠️ Lỗi kết nối Cloud AI.");
         }
     }
 
@@ -113,12 +124,15 @@ public class OllamaLabMentorService {
     public List<String> generateAutoSuggestPayloads(String labType, String userInput) {
 
         String systemPrompt = """
-                You are a cybersecurity payload generator for educational labs.
-                Lab type: '%s'. User input context: '%s'.
-                Generate EXACTLY 5 advanced payloads for this lab type.
-                Return ONLY a JSON array of 5 strings. Example: ["p1", "p2", "p3", "p4", "p5"].
-                No explanations, no markdown, just the JSON array.
-                """.formatted(labType, userInput != null ? userInput : "none");
+                You are a senior cybersecurity expert generating advanced payloads for educational labs.
+                Lab type: '%s'. User context (typing): '%s'.
+                REQUIREMENTS:
+                1. Generate EXACTLY 5 high-quality, realistic, and professional payloads.
+                2. Mix simple and advanced bypass techniques (WAF bypass, obfuscation, etc.).
+                3. If user context is provided, tailor the payloads to fit that context.
+                4. Return ONLY a JSON array of 5 strings. Example: ["payload1", "payload2", "...", "...", "p5"].
+                5. NO text, NO markdown, NO code blocks. Only the raw JSON array.
+                """.formatted(labType, userInput != null && !userInput.isBlank() ? userInput : "No specific context");
 
         try {
             // Dùng callAI() → ưu tiên HF Cloud, fallback Ollama
@@ -129,6 +143,9 @@ public class OllamaLabMentorService {
             rawJson = extractJsonArray(rawJson);
 
             return mapper.readValue(rawJson, new TypeReference<List<String>>() {});
+        } catch (HttpClientErrorException ice) {
+            log.error("❌ Suggestion API Error: {} - {}", ice.getStatusCode(), ice.getResponseBodyAsString());
+            return fallbackPayloads(labType);
         } catch (Exception e) {
             log.warn("⚠️ AI Suggest fallback for {}: {}", labType, e.getMessage());
             return fallbackPayloads(labType);

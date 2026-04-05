@@ -206,12 +206,14 @@
 .support-chat-msg--assistant { justify-content: flex-start; }
 
 .support-chat-msg__bubble {
-  max-width: 88%;
+  max-width: 85%;
   padding: 10px 14px;
   border-radius: 16px;
   font-size: 13px;
   line-height: 1.6;
   position: relative;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .support-chat-msg--user .support-chat-msg__bubble {

@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 
 /**
- * Health check endpoint for Phase 1 infrastructure.
- * Verifies: PostgreSQL + pgvector, Redis, Ollama/LLM
+ * Health check endpoint for CyberShield AI infrastructure.
+ * Verifies: PostgreSQL, Redis, Cloud AI (Hugging Face / Qwen 2.5)
  *
  * GET /api/public/system-health
  */
@@ -74,22 +74,21 @@ public class SystemHealthController {
             health.put("redis", Map.of("status", "DOWN", "error", e.getMessage()));
         }
 
-        // 4. Ollama/LLM check
+        // 4. AI Service (Cloud) check
         try {
             String response = chatModel.generate("Say OK");
-            health.put("ollama", Map.of(
+            health.put("aiService", Map.of(
                     "status", "UP",
-                    "model", ollamaModel,
-                    "baseUrl", ollamaBaseUrl,
+                    "provider", "Hugging Face (Cloud)",
+                    "model", "Qwen 2.5-7B",
                     "testResponse", response.substring(0, Math.min(response.length(), 50))));
         } catch (Exception e) {
-            health.put("ollama", Map.of(
+            health.put("aiService", Map.of(
                     "status", "DOWN",
-                    "model", ollamaModel,
-                    "baseUrl", ollamaBaseUrl,
+                    "model", "Qwen 2.5 (Cloud)",
                     "error",
                     e.getMessage() != null ? e.getMessage().substring(0, Math.min(e.getMessage().length(), 200))
-                            : "Unknown error"));
+                            : "AI Cloud Service Timeout"));
         }
 
         // Overall status

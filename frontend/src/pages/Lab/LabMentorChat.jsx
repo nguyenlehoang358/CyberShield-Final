@@ -70,20 +70,32 @@ export default function LabMentorChat({ labId, labContext }) {
     // Auto-fill: Phát hiện code block hoặc marker FILL_FORM trong response AI
     const tryAutoFill = (text) => {
         if (!text) return
-        // Marker: <!--FILL_FORM:value-->
+        
+        // 1. Ưu tiên: Marker chuẩn <!--FILL_FORM:value-->
         const markerMatch = text.match(/<!--FILL_FORM:(.*?)-->/s)
         if (markerMatch) {
             autoFill(markerMatch[1].trim())
             return
         }
-        // Nếu user yêu cầu "điền vào" / "fill" và response có code block → auto-fill
-        const lastUserMsg = messages.filter(m => m.role === 'user').pop()?.text?.toLowerCase() || ''
-        const fillKeywords = ['điền', 'fill', 'tự động', 'auto', 'nhập vào', 'paste', 'mã hóa giúp', 'encrypt', 'decode', 'giải mã']
-        const userWantsFill = fillKeywords.some(kw => lastUserMsg.includes(kw))
-        if (userWantsFill) {
-            const codeMatch = text.match(/```[\w]*\n?(.*?)```/s)
-            if (codeMatch) {
-                autoFill(codeMatch[1].trim())
+
+        // 2. Dự phòng: Phát hiện code blocks nếu user yêu cầu hành động
+        const lastUserMsg = messages[messages.length - 1]?.text?.toLowerCase() || ''
+        const fillKeywords = [
+            'điền', 'fill', 'tự động', 'auto', 'nhập vào', 'paste', 
+            'mã hóa', 'encrypt', 'decode', 'giải mã', 'hash', 'băm',
+            'payload', 'suggest', 'gợi ý'
+        ]
+        const userWantsAction = fillKeywords.some(kw => lastUserMsg.includes(kw))
+        
+        if (userWantsAction) {
+            //Regex bắt nội dung giữa ``` (có hoặc không có tên ngôn ngữ)
+            const codeMatch = text.match(/```(?:[\w]*\n)?([\s\S]*?)```/)
+            if (codeMatch && codeMatch[1].trim().length > 0) {
+                // Chỉ điền nếu độ dài hợp lý và không phải là một đoạn văn dài
+                const candidate = codeMatch[1].trim()
+                if (candidate.length < 500 && !candidate.includes('\n\n')) {
+                    autoFill(candidate)
+                }
             }
         }
     }

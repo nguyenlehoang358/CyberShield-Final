@@ -280,7 +280,7 @@ public class SecurityAdvisorService {
             sb.append("- **ĐỀ XUẤT KHẨN CẤP**: Block tất cả IP đáng ngờ, review firewall rules.\n");
         }
 
-        sb.append("\n⚠️ *Phân tích tự động (rule-based). Kết nối Ollama để có phân tích AI chi tiết hơn.*");
+        sb.append("\n⚠️ *Phân tích tự động (AI-Lite). Vui lòng kiểm tra lại kết nối Cloud AI để có báo cáo chi tiết.*");
         return sb.toString();
     }
 
