@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useLanguage } from '../../context/LanguageContext'
+import { useAuth } from '../../context/AuthContext'
 import './SupportChatWidget.css'
 
 const translations = {
@@ -144,10 +145,8 @@ function renderMarkdown(text) {
 export default function SupportChatWidget() {
     const location = useLocation()
     const { lang: language } = useLanguage()
+    const { api } = useAuth()
     const t = translations[language] || translations.vi
-
-    const currentIP = window.location.hostname
-    const apiBase = (currentIP === 'localhost' || currentIP === '127.0.0.1') ? '' : `https://${currentIP}:8443`
 
     const [isOpen, setIsOpen] = useState(false)
     const [messages, setMessages] = useState([
@@ -155,11 +154,9 @@ export default function SupportChatWidget() {
     ])
     const [input, setInput] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const [isOnline, setIsOnline] = useState(null)
-    const [docCount, setDocCount] = useState(0)
+    const [isOnline, setIsOnline] = useState(true) // Mặc định online vì dùng Cloud AI
     const messagesEndRef = useRef(null)
     const inputRef = useRef(null)
-    const abortControllerRef = useRef(null)
 
     if (location.pathname.startsWith('/lab')) {
         return null; // hide on lab pages
@@ -175,41 +172,6 @@ export default function SupportChatWidget() {
         }
     }, [isOpen])
 
-    useEffect(() => {
-        const controller = new AbortController()
-        checkHealth(controller.signal)
-        return () => {
-            controller.abort()
-            if (abortControllerRef.current) {
-                abortControllerRef.current.abort()
-            }
-        }
-    }, [])
-
-    const checkHealth = async (signal) => {
-        try {
-            const res = await fetch(`${apiBase}/api/ai/status`, { signal })
-            if (res.ok) {
-                const data = await res.json()
-                setIsOnline(data.status === 'OK')
-                setDocCount(data.totalDocuments || 0)
-            } else {
-                setIsOnline(false)
-            }
-        } catch (err) {
-            if (err.name === 'AbortError') return
-            // Fallback to system-health endpoint
-            try {
-                const res = await fetch(`${apiBase}/api/public/system-health`, { signal })
-                const data = await res.json()
-                setIsOnline(data.ollama?.status === 'UP')
-            } catch (fallbackErr) {
-                if (fallbackErr.name === 'AbortError') return
-                setIsOnline(false)
-            }
-        }
-    }
-
     const sendMessage = useCallback(async () => {
         const trimmed = input.trim()
         if (!trimmed || isLoading) return
@@ -219,65 +181,43 @@ export default function SupportChatWidget() {
         setInput('')
         setIsLoading(true)
 
-        if (abortControllerRef.current) {
-            abortControllerRef.current.abort() // Cancel previous request if any
-        }
-        abortControllerRef.current = new AbortController();
-
         try {
-            const token = localStorage.getItem('token')
-            const res = await fetch(`${apiBase}/api/ai/chat`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
-                body: JSON.stringify({
-                    message: trimmed,
-                    sessionId: getSessionId(),
-                    mode: 'support'
-                }),
-                signal: abortControllerRef.current.signal
+            // Dùng endpoint /ai/lab/chat đã hoạt động trên Cloud (HF)
+            const res = await api.post('/ai/lab/chat', {
+                message: trimmed,
+                labContext: 'support-general',
+                labId: 'support'
             })
 
-            if (res.status === 429) {
-                const data = await res.json().catch(() => ({}))
-                const retryAfter = data.retryAfter || 30
-                setMessages(prev => [...prev, {
-                    role: 'assistant',
-                    content: `${t.rateLimited} (${retryAfter}s)`,
-                    timestamp: new Date(),
-                    isError: true
-                }])
-                return
-            }
-
-            if (!res.ok) throw new Error(`HTTP ${res.status}`)
-            const data = await res.json()
+            const data = res.data
+            const reply = typeof data === 'string' ? data : (data.reply || data.response || data.message || t.errorMsg)
 
             setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: data.response || data.message || t.errorMsg,
+                content: reply,
                 timestamp: new Date(),
-                sources: data.sources || [],
-                ragEnabled: data.ragEnabled || false,
-                sourcesCount: data.sourcesCount || 0,
                 responseTimeMs: data.responseTimeMs || 0,
-                model: data.model || 'unknown'
+                model: data.model || 'Qwen 2.5'
             }])
+            setIsOnline(true)
         } catch (err) {
-            if (err.name === 'AbortError') return;
-            console.error('AI Chat error:', err)
+            if (err.name === 'AbortError' || err.name === 'CanceledError') return;
+
+            const isRateLimit = err?.response?.status === 429
+            const errContent = isRateLimit
+                ? t.rateLimited
+                : t.errorMsg
+
             setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: isOnline === false ? t.offlineMsg : t.errorMsg,
+                content: errContent,
                 timestamp: new Date(),
                 isError: true
             }])
         } finally {
             setIsLoading(false)
         }
-    }, [input, isLoading, isOnline, t])
+    }, [input, isLoading, t, api])
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -286,28 +226,9 @@ export default function SupportChatWidget() {
         }
     }
 
-    const clearChat = async () => {
-        const sessionId = getSessionId()
+    const clearChat = () => {
         setMessages([{ role: 'assistant', content: t.welcome, timestamp: new Date() }])
-        // Also clear server-side history
-        try {
-            const token = localStorage.getItem('token')
-            await fetch(`${apiBase}/api/ai/clear?sessionId=${sessionId}`, {
-                method: 'POST',
-                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-            })
-        } catch { /* ignore */ }
-        // New session
         sessionStorage.removeItem('ai_chat_session')
-    }
-
-    const getSessionId = () => {
-        let sid = sessionStorage.getItem('ai_chat_session')
-        if (!sid) {
-            sid = 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9)
-            sessionStorage.setItem('ai_chat_session', sid)
-        }
-        return sid
     }
 
     const formatTime = (date) => {
@@ -360,14 +281,9 @@ export default function SupportChatWidget() {
                             <div>
                                 <h4 className="support-chat-header__title">{t.title}</h4>
                                 <div className="support-chat-header__meta">
-                                    <span className={`support-chat-header__status ${isOnline ? 'online' : 'offline'}`}>
-                                        {isOnline ? '● Online' : '○ Offline'}
+                                    <span className={`support-chat-header__status online`}>
+                                        ● Online
                                     </span>
-                                    {docCount > 0 && (
-                                        <span className="support-chat-header__docs">
-                                            📚 {docCount} docs
-                                        </span>
-                                    )}
                                 </div>
                             </div>
                         </div>

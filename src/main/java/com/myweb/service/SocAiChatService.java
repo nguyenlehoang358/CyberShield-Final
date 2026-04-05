@@ -16,8 +16,6 @@ import com.myweb.entity.LoginAttempt;
 import com.myweb.repository.BlockedIpHistoryRepository;
 import com.myweb.repository.LoginAttemptRepository;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
-
 /**
  * SOC AI Chat Service — Security Operations Center Assistant.
  *
@@ -36,16 +34,16 @@ public class SocAiChatService {
             "(?:ch[aặ]n|block|kh[oó]a|ban)\\s+(?:ip\\s+)?([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})",
             Pattern.CASE_INSENSITIVE);
 
-    private final ChatLanguageModel chatModel;
+    private final OllamaLabMentorService ollamaLabMentorService;
     private final LoginAttemptRepository loginAttemptRepo;
     private final BlockedIpHistoryRepository blockedIpRepo;
     private final BruteForceProtectionService bruteForceService;
 
-    public SocAiChatService(ChatLanguageModel chatModel,
+    public SocAiChatService(OllamaLabMentorService ollamaLabMentorService,
             LoginAttemptRepository loginAttemptRepo,
             BlockedIpHistoryRepository blockedIpRepo,
             BruteForceProtectionService bruteForceService) {
-        this.chatModel = chatModel;
+        this.ollamaLabMentorService = ollamaLabMentorService;
         this.loginAttemptRepo = loginAttemptRepo;
         this.blockedIpRepo = blockedIpRepo;
         this.bruteForceService = bruteForceService;
@@ -111,17 +109,18 @@ public class SocAiChatService {
         // Step 2: Build the SOC-specific prompt
         String prompt = buildSocPrompt(securityContext, command);
 
-        log.info("🧠 SOC AI: Sending analysis request to Ollama (prompt={}chars)", prompt.length());
+        log.info("🧠 SOC AI: Sending analysis request to Cloud AI (prompt={}chars)", prompt.length());
 
-        // Step 3: Call Ollama via LangChain4j
-        String aiResponse = chatModel.generate(prompt);
+        // Step 3: Call AI via the centralized service (HF Cloud/Qwen 2.5-7B)
+        Map<String, Object> aiResult = ollamaLabMentorService.callAI(prompt);
+        String aiResponse = (String) aiResult.get("reply");
 
         long elapsed = System.currentTimeMillis() - startTime;
 
         result.put("type", "analysis");
         result.put("response", aiResponse);
         result.put("responseTimeMs", elapsed);
-        result.put("model", "ollama-soc");
+        result.put("model", "Cloud AI - Qwen 2.5-7B");
         return result;
     }
 

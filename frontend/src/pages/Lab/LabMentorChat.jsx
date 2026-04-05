@@ -7,7 +7,7 @@ import { useLab } from '../../context/LabContext'
 export default function LabMentorChat({ labId, labContext }) {
     const { api, user } = useAuth()
     const { t, lang } = useLanguage()
-    const { setLabInputData } = useLab()
+    const { autoFill } = useLab()
     const [messages, setMessages] = useState([])
     const [input, setInput] = useState('')
     const [loading, setLoading] = useState(false)
@@ -40,13 +40,12 @@ export default function LabMentorChat({ labId, labContext }) {
         setLoading(true)
 
         try {
-            const res = await api.post('/ai/lab-mentor', {
+            const res = await api.post('/ai/lab/chat', {
                 message: msg,
                 labContext: labContext || '',
                 labId: labId || ''
             })
 
-            // Đơn giản hóa bộ lọc kết quả từ BE
             const aiReply = typeof res.data === 'string' ? res.data : (res.data.reply || JSON.stringify(res.data));
 
             setMessages(prev => [...prev, {
@@ -55,7 +54,8 @@ export default function LabMentorChat({ labId, labContext }) {
                 ts: Date.now()
             }])
 
-            // Đã xóa bỏ logic FILL_FORM (Auto-fill) để ổn định hệ thống
+            // 🔧 Auto-Fill: Nếu AI trả về code block hoặc marker FILL_FORM, tự động điền vào Lab input
+            tryAutoFill(aiReply)
         } catch (err) {
             const errMsg = err?.response?.status === 429
                 ? (lang === 'vi' ? '⏳ Hệ thống Mentor đang quá tải. Vui lòng đợi vài giây.' : '⏳ Mentor system is overloaded. Please wait.')
@@ -64,6 +64,27 @@ export default function LabMentorChat({ labId, labContext }) {
         } finally {
             setLoading(false)
             inputRef.current?.focus()
+        }
+    }
+
+    // Auto-fill: Phát hiện code block hoặc marker FILL_FORM trong response AI
+    const tryAutoFill = (text) => {
+        if (!text) return
+        // Marker: <!--FILL_FORM:value-->
+        const markerMatch = text.match(/<!--FILL_FORM:(.*?)-->/s)
+        if (markerMatch) {
+            autoFill(markerMatch[1].trim())
+            return
+        }
+        // Nếu user yêu cầu "điền vào" / "fill" và response có code block → auto-fill
+        const lastUserMsg = messages.filter(m => m.role === 'user').pop()?.text?.toLowerCase() || ''
+        const fillKeywords = ['điền', 'fill', 'tự động', 'auto', 'nhập vào', 'paste', 'mã hóa giúp', 'encrypt', 'decode', 'giải mã']
+        const userWantsFill = fillKeywords.some(kw => lastUserMsg.includes(kw))
+        if (userWantsFill) {
+            const codeMatch = text.match(/```[\w]*\n?(.*?)```/s)
+            if (codeMatch) {
+                autoFill(codeMatch[1].trim())
+            }
         }
     }
 
@@ -104,7 +125,7 @@ export default function LabMentorChat({ labId, labContext }) {
                     </div>
                     <div>
                         <div className="mentor-title">Lab Mentor</div>
-                        <div className="mentor-subtitle">Gemini 2.5 Flash</div>
+                        <div className="mentor-subtitle">Qwen 2.5 · Cloud AI</div>
                     </div>
                 </div>
                 <button className="mentor-clear-btn" onClick={handleClear} title={lang === 'vi' ? 'Xóa hội thoại' : 'Clear chat'}>

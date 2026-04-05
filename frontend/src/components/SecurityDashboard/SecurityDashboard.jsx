@@ -232,6 +232,7 @@ export default function SecurityDashboard() {
                 action: data.action,
                 targetIp: data.targetIp,
                 responseTimeMs: data.responseTimeMs,
+                model: data.model || 'Cloud AI - Qwen 2.5',
                 time: new Date()
             }])
 
@@ -454,16 +455,18 @@ export default function SecurityDashboard() {
                                             </span>
                                         ))}
                                     </div>
-                                    {msg.responseTimeMs && (
-                                        <div className="soc-msg-meta">⏱️ {msg.responseTimeMs}ms</div>
-                                    )}
+                                    <div className="soc-msg-meta">
+                                        {msg.model && <span className="soc-msg-model">{msg.model}</span>}
+                                        {msg.responseTimeMs && <span>⏱️ {(msg.responseTimeMs / 1000).toFixed(1)}s</span>}
+                                    </div>
                                 </div>
                             ))}
                             {socLoading && (
                                 <div className="soc-msg soc-msg--assistant">
                                     <div className="soc-msg-content soc-thinking">
-                                        <div className="soc-dots"><span /><span /><span /></div>
-                                        {t.socThinking}
+                                        <div className="soc-dots"><span></span><span></span><span></span></div>
+                                        <span className="soc-thinking-text">{t.socThinking}</span>
+                                        <span className="soc-thinking-model">via Cloud AI - Qwen 2.5</span>
                                     </div>
                                 </div>
                             )}

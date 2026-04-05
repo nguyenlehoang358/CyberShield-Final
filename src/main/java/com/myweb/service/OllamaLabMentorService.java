@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,10 @@ public class OllamaLabMentorService {
         return callAI(fullPrompt);
     }
 
-    private Map<String, Object> callAI(String prompt) {
+    /**
+     * 🌐 Centralized AI Caller: Prioritizes HF Cloud, falls back to Ollama.
+     */
+    public Map<String, Object> callAI(String prompt) {
         // Ưu tiên dùng Hugging Face (Dễ chạy trên Render nhất)
         if (geminiApiKey != null && !geminiApiKey.isBlank()) {
             return callHuggingFace(prompt);
@@ -105,35 +107,48 @@ public class OllamaLabMentorService {
 
     /**
      * 🤖 PHẦN 2: GỢI Ý PAYLOAD
-     * Thay thế Gemini bằng Qwen để tránh lỗi thiếu API Key.
+     * Dùng Cloud AI (Hugging Face) thay vì Ollama local.
      */
     @Cacheable(value = "labSuggestions", key = "#labType + '_' + (#userInput != null ? #userInput : '')")
     public List<String> generateAutoSuggestPayloads(String labType, String userInput) {
 
         String systemPrompt = """
-                Bạn là AI chuyên tạo payload an ninh mạng.
-                Dựa trên loại bài Lab: '%s' và input: '%s'.
-                Hãy sinh ra ĐÚNG 3 đoạn payload NÂNG CAO.
-                Trả về DUY NHẤT một mảng JSON array chứa 3 chuỗi. Ví dụ: ["p1", "p2", "p3"].
-                Không giải thích gì thêm.
-                """.formatted(labType, userInput != null ? userInput : "Trống");
+                You are a cybersecurity payload generator for educational labs.
+                Lab type: '%s'. User input context: '%s'.
+                Generate EXACTLY 5 advanced payloads for this lab type.
+                Return ONLY a JSON array of 5 strings. Example: ["p1", "p2", "p3", "p4", "p5"].
+                No explanations, no markdown, just the JSON array.
+                """.formatted(labType, userInput != null ? userInput : "none");
 
         try {
-            Map<String, Object> response = callOllama(systemPrompt);
+            // Dùng callAI() → ưu tiên HF Cloud, fallback Ollama
+            Map<String, Object> response = callAI(systemPrompt);
             String rawJson = (String) response.get("reply");
 
-            // Làm sạch chuỗi để parse JSON
-            rawJson = rawJson.replaceAll("(?s)^```json\\s*", "")
-                    .replaceAll("(?s)^```\\s*", "")
-                    .replaceAll("(?s)```\\s*$", "")
-                    .trim();
+            // Trích xuất JSON array từ response (AI đôi khi trả về text kèm theo)
+            rawJson = extractJsonArray(rawJson);
 
-            return mapper.readValue(rawJson, new TypeReference<List<String>>() {
-            });
+            return mapper.readValue(rawJson, new TypeReference<List<String>>() {});
         } catch (Exception e) {
-            System.err.println("Ollama Suggest Error: " + e.getMessage());
+            log.warn("⚠️ AI Suggest fallback for {}: {}", labType, e.getMessage());
             return fallbackPayloads(labType);
         }
+    }
+
+    // Trích xuất JSON array từ chuỗi AI response (loại bỏ markdown, text thừa)
+    private String extractJsonArray(String raw) {
+        if (raw == null) return "[]";
+        // Loại bỏ code block markers
+        raw = raw.replaceAll("(?s)```json\\s*", "")
+                 .replaceAll("(?s)```\\s*", "")
+                 .trim();
+        // Tìm JSON array pattern [...]
+        int start = raw.indexOf('[');
+        int end = raw.lastIndexOf(']');
+        if (start >= 0 && end > start) {
+            return raw.substring(start, end + 1);
+        }
+        return "[]";
     }
 
     // Hàm dùng chung để gọi Ollama
@@ -182,11 +197,16 @@ public class OllamaLabMentorService {
     }
 
     private List<String> fallbackPayloads(String labType) {
-        if ("sqli".equalsIgnoreCase(labType)) {
-            return List.of("' OR 1=1 --", "' UNION SELECT null, user() --", "admin' #");
-        } else if ("xss".equalsIgnoreCase(labType)) {
-            return List.of("<script>alert('XSS')</script>", "<img src=x onerror=alert(1)>", "javascript:alert(1)");
-        }
-        return List.of("test_payload_1", "test_payload_2", "test_payload_3");
+        return switch (labType.toLowerCase()) {
+            case "sqli" -> List.of("' OR 1=1 --", "' UNION SELECT null, user() --", "admin' #", "1' AND 1=2 UNION SELECT table_name FROM information_schema.tables --", "' OR ''='");
+            case "xss" -> List.of("<script>alert('XSS')</script>", "<img src=x onerror=alert(1)>", "javascript:alert(1)", "<svg onload=alert('XSS')>", "\"onfocus=alert(1) autofocus=\"");
+            case "encryption" -> List.of("Hello World", "CyberShield2026", "The quick brown fox", "Attack at dawn", "P@ssw0rd!Secure");
+            case "hashing" -> List.of("password123", "admin", "CyberShield", "test123456", "Hello World");
+            case "password" -> List.of("123456", "password", "admin123", "qwerty", "P@$$w0rd!2026#Str0ng");
+            case "firewall" -> List.of("192.168.1.100", "10.0.0.0/8", "0.0.0.0/0", "ALLOW TCP 443", "DENY UDP 53");
+            case "https" -> List.of("https://example.com", "TLS 1.3", "Certificate SHA-256", "HSTS max-age=31536000", "SSL Pinning");
+            case "jwt" -> List.of("eyJhbGciOiJIUzI1NiJ9", "{\"alg\":\"none\"}", "{\"sub\":\"admin\",\"role\":\"ADMIN\"}", "HS256 vs RS256", "Bearer token");
+            default -> List.of("test_payload_1", "test_payload_2", "test_payload_3", "test_payload_4", "test_payload_5");
+        };
     }
 }
