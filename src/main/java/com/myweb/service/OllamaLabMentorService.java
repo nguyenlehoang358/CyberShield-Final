@@ -60,19 +60,19 @@ public class OllamaLabMentorService {
     }
 
     private Map<String, Object> callHuggingFace(String prompt) {
-        // Quay lại URL chuẩn nhất (Official) - Nếu báo 410 nữa, chúng ta sẽ biết Hugging Face đang bảo trì
-        String hfUrl = "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-7B-Instruct";
-        
-        // 🛡️ CHỈNH SỬA PAYLOAD CHUẨN HF
+        // ✅ URL mới chính thức của Hugging Face (OpenAI-compatible)
+        String hfUrl = "https://router.huggingface.co/v1/chat/completions";
+
+        // Payload chuẩn OpenAI Chat Completions format
+        Map<String, Object> userMessage = new HashMap<>();
+        userMessage.put("role", "user");
+        userMessage.put("content", prompt);
+
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("inputs", prompt);
-        
-        // Thêm tham số điều khiển
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("max_new_tokens", 800);
-        parameters.put("temperature", 0.7);
-        parameters.put("return_full_text", false);
-        requestBody.put("parameters", parameters);
+        requestBody.put("model", "Qwen/Qwen2.5-7B-Instruct");
+        requestBody.put("messages", List.of(userMessage));
+        requestBody.put("max_tokens", 800);
+        requestBody.put("temperature", 0.7);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -81,24 +81,24 @@ public class OllamaLabMentorService {
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
         try {
-            log.info("🌟 Gọi AI via Hugging Face Cloud (Hardened Mode)...");
-            // NHẬN VỀ JSON DẠNG MẢNG
+            log.info("🌟 Gọi AI via Hugging Face Router (OpenAI-compatible)...");
             JsonNode response = restTemplate.postForObject(hfUrl, entity, JsonNode.class);
-            
-            if (response != null && response.isArray() && response.size() > 0) {
-                String reply = response.get(0).get("generated_text").asText();
-                return Map.of("reply", reply);
-            } else if (response != null && response.has("generated_text")) {
-                // Đôi khi HF trả về Object thay vì Array
-                return Map.of("reply", response.get("generated_text").asText());
+
+            // Response format: {"choices": [{"message": {"content": "..."}}]}
+            if (response != null && response.has("choices")) {
+                JsonNode choices = response.get("choices");
+                if (choices.isArray() && choices.size() > 0) {
+                    String reply = choices.get(0).get("message").get("content").asText();
+                    return Map.of("reply", reply);
+                }
             }
-            log.error("🛑 HF Unknown JSON: {}", response);
+            log.error("🛑 HF Unknown response: {}", response);
             return Map.of("reply", "⚠️ AI trả về dữ liệu không nhận diện được.");
         } catch (org.springframework.web.client.HttpClientErrorException ice) {
-            log.error("❌ Hugging Face API Error: {} - Info: {}", ice.getStatusCode(), ice.getResponseBodyAsString());
-            return Map.of("reply", "⚠️ Lỗi Hugging Face (" + ice.getStatusCode() + "): " + ice.getResponseBodyAsString());
+            log.error("❌ HF API Error: {} - {}", ice.getStatusCode(), ice.getResponseBodyAsString());
+            return Map.of("reply", "⚠️ Lỗi HF (" + ice.getStatusCode() + "): " + ice.getResponseBodyAsString());
         } catch (Exception e) {
-            log.error("💥 HF Global Crash: {}", e.getMessage());
+            log.error("💥 HF Error: {}", e.getMessage());
             return Map.of("reply", "⚠️ Lỗi AI Cloud: " + e.getMessage());
         }
     }
