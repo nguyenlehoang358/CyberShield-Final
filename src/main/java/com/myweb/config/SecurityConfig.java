@@ -104,7 +104,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**", "/v3/api-docs")
                         .permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/public/**", "/test-ai.html").permitAll()
+                        .requestMatchers("/api/public/**", "/test-ai.html", "/api/ai/lab/chat").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/contact").permitAll()
                         .requestMatchers("/api/ai/chat", "/api/ai/status", "/api/ai/health").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/blog/**").permitAll()
