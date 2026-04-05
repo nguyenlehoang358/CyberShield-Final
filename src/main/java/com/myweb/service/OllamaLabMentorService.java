@@ -60,8 +60,8 @@ public class OllamaLabMentorService {
     }
 
     private Map<String, Object> callHuggingFace(String prompt) {
-        // Cập nhật URL mới theo yêu cầu của Hugging Face
-        String hfUrl = "https://router.huggingface.co/hf/Qwen/Qwen2.5-7B-Instruct";
+        // Quay lại URL chuẩn nhất (Official) - Nếu báo 410 nữa, chúng ta sẽ biết Hugging Face đang bảo trì
+        String hfUrl = "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-7B-Instruct";
         
         // 🛡️ CHỈNH SỬA PAYLOAD CHUẨN HF
         Map<String, Object> requestBody = new HashMap<>();
