@@ -24,7 +24,7 @@ export default function PartnerSecurityMonitor() {
         try {
             const res = await api.get('/v1/external/alerts');
             const newAlerts = res.data || [];
-            
+
             // LOGIC CẢNH BÁO MỚI: So sánh ID của bản ghi đầu tiên (Mới nhất)
             if (alerts.length > 0 && newAlerts.length > 0) {
                 if (newAlerts[0].id !== alerts[0].id) {
@@ -36,7 +36,7 @@ export default function PartnerSecurityMonitor() {
                     });
                 }
             }
-            
+
             setAlerts(newAlerts);
         } catch (err) {
             console.error('Failed to load partner alerts', err);
@@ -73,7 +73,7 @@ export default function PartnerSecurityMonitor() {
                     </p>
                 </div>
                 <div className="active-badge" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.7rem 1.2rem', borderRadius: '30px', fontSize: '0.9rem', fontWeight: 'bold', border: '1px solid rgba(34, 197, 94, 0.2)', boxShadow: '0 0 15px rgba(34, 197, 94, 0.2)' }}>
-                   ● {lang === 'vi' ? 'Hệ thống Đang bảo vệ 24/7' : '24/7 Shield Active'}
+                    ● {lang === 'vi' ? 'Hệ thống Đang bảo vệ 24/7' : '24/7 Shield Active'}
                 </div>
             </div>
 
@@ -125,7 +125,8 @@ export default function PartnerSecurityMonitor() {
                 </div>
             </div>
 
-            <style dangerouslySetInnerHTML={{ __html: `
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 .threat-row:hover {
                     background: rgba(239, 68, 68, 0.05) !important;
                 }

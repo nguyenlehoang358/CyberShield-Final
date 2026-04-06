@@ -17,7 +17,7 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api/v1/external")
-@CrossOrigin("*") // Cho phép mọi website khách hàng có thể gửi báo cáo về SOC
+@CrossOrigin("*") 
 public class ExternalSecurityController {
 
     @Autowired
@@ -28,26 +28,21 @@ public class ExternalSecurityController {
 
     /**
      * API TIẾP NHẬN BÁO CÁO TẤN CÔNG (PUBLIC ENDPOINT)
-     * Nhận dữ liệu từ JS Agent được nhúng trên web khách hàng.
      */
     @PostMapping("/alert")
     public ResponseEntity<?> receiveExternalAlert(@RequestBody ExternalSecurityAlert incomingAlert, 
                                                @RequestParam String apiKey) {
-        // [KIỂM TRA]: Website này có phải là đối tác đã đăng ký với CyberShield không?
         Optional<ExternalClientSite> siteOpt = siteRepository.findByApiKey(apiKey);
         
         if (siteOpt.isEmpty()) {
-            return ResponseEntity.status(403).body("Invalid or missing API Key. External protection denied.");
+            return ResponseEntity.status(403).body("Invalid or missing API Key.");
         }
 
         ExternalClientSite site = siteOpt.get();
-        
-        // [GHI NHẬN]: Lưu vết cuộc tấn công vào Database của trung tâm SOC
         incomingAlert.setClientId(site.getId());
-        ExternalSecurityAlert savedAlert = alertRepository.save(incomingAlert);
+        alertRepository.save(incomingAlert);
 
-        // Trả về kết quả cho Agent phía Client biết là chúng ta đã nhận cảnh báo
-        return ResponseEntity.ok("External Alert Registered successfully at CyberShield SOC!");
+        return ResponseEntity.ok("External Alert Registered successfully!");
     }
 
     /**
@@ -60,10 +55,10 @@ public class ExternalSecurityController {
     }
 
     /**
-     * API TẠO MỚI MỘT WEBSITE ĐỐI TÁC (TẠO API KEY)
-     * Admin sẽ dùng cái này để cấp phép bảo vệ cho một web mới.
+     * API TẠO MỚI MỘT WEBSITE ĐỐI TÁC
      */
     @PostMapping("/manage/register-site")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ExternalClientSite> registerPartnerSite(@RequestBody ExternalClientSite site) {
         return ResponseEntity.ok(siteRepository.save(site));
     }
