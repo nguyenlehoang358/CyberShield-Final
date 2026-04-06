@@ -130,9 +130,27 @@ export default function AuthPage() {
     const { login, register, verifyMfa, forgotPassword, resetPassword } = useAuth()
     const { lang, toggleLang, t } = useLanguage()
 
+    // ─── Catch OAuth2 Errors from URL ───
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search)
+        const error = params.get('error')
+        if (error) {
+            const errorMessages = {
+                oauth_user_not_found: t('err_oauth_user_not_found') || 'Không tìm thấy tài khoản liên kết.',
+                oauth2_failed: t('err_oauth2_failed') || 'Đăng nhập OAuth thất bại (Lỗi cấu hình Backend).',
+                auth_failed_after_oauth: t('err_auth_failed') || 'Lỗi xác thực sau khi đăng nhập Social.'
+            }
+            toast.error(errorMessages[error] || error)
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname)
+        }
+    }, [t])
+
     const handleSocialLogin = (provider) => {
-        const currentHost = window.location.hostname
-        window.location.href = `https://${currentHost}:8443/oauth2/authorization/${provider}`
+        // Derive backend base URL from environment (strip /api if present)
+        const apiBase = import.meta.env.VITE_API_BASE_URL || `https://${window.location.hostname}:8443/api`
+        const backendBase = apiBase.replace('/api', '')
+        window.location.href = `${backendBase}/oauth2/authorization/${provider}`
     }
 
     // Login State

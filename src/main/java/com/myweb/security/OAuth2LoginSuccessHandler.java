@@ -22,6 +22,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
 
+    @org.springframework.beans.factory.annotation.Value("${app.security.frontend-url}")
+    private String frontendUrl;
+
     public OAuth2LoginSuccessHandler(JwtUtil jwtUtil, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
@@ -73,7 +76,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                     .from("jwt", linkToken)
                     .httpOnly(true).secure(true).path("/").sameSite("None").maxAge(86400).build();
             response.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, springCookie.toString());
-            response.sendRedirect("http://localhost:5173/oauth2/redirect?token=" + linkToken + "&linked=true");
+            response.sendRedirect(frontendUrl + "/oauth2/redirect?token=" + linkToken + "&linked=true");
             return;
         }
 
@@ -102,9 +105,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                     .httpOnly(true).secure(true).path("/").sameSite("None").maxAge(86400).build();
             response.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, springCookie.toString());
 
-            response.sendRedirect("http://localhost:5173/oauth2/redirect?token=" + token);
+            response.sendRedirect(frontendUrl + "/oauth2/redirect?token=" + token);
         } else {
-            response.sendRedirect("http://localhost:5173/login?error=oauth_user_not_found");
+            response.sendRedirect(frontendUrl + "/login?error=oauth_user_not_found");
         }
     }
 }

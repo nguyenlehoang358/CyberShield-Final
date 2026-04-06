@@ -27,11 +27,26 @@ console.log("🚀 CyberShield API Connection:", apiBaseURL)
 const api = axios.create({
     baseURL: apiBaseURL,
     withCredentials: true,
+    timeout: 25000, // 25 giây (Đủ cho Render thức dậy nhưng không làm treo UI quá lâu)
     headers: {
         'ngrok-skip-browser-warning': 'true',
         'bypass-tunnel-reminder': 'true'
     }
 })
+
+// Interceptor xử lý lỗi 'Server Down' hoặc 'Cold Start'
+api.interceptors.response.use(
+    response => response,
+    error => {
+        if (!error.response && error.code === 'ECONNABORTED') {
+            console.warn("⚠️ API Timeout: Server quá chậm hoặc đang khởi động.");
+        }
+        if (error.response?.status === 502 || error.response?.status === 503) {
+            console.warn("🚀 Server đang thức dậy (Cold Start)... Vui lòng đợi.");
+        }
+        return Promise.reject(error);
+    }
+);
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)

@@ -50,15 +50,25 @@ const SecurityScanner = lazy(() => import('./pages/Tools/SecurityScanner'))
 import CTFHub from './pages/CTF/CTFHub'
 import { Toaster } from 'sonner'
 
+function LoadingScreen() {
+    return (
+        <div className="p-20 text-center flex flex-col items-center justify-center min-h-[60vh]">
+            <i className='bx bx-loader-alt bx-spin text-5xl text-accent mb-4'></i>
+            <h2 className="text-xl font-bold">CyberShield đang tải...</h2>
+            <p className="text-sm opacity-70 mt-2">Server (Render) có thể cần 1-2 phút để thức dậy.</p>
+        </div>
+    );
+}
+
 function ProtectedRoute() {
     const { user, loading } = useAuth()
-    if (loading) return <div className="p-10 text-center">Loading...</div>
+    if (loading) return <LoadingScreen />
     return user ? <Outlet /> : <Navigate to="/login" />
 }
 
 function AdminRoute() {
     const { user, loading } = useAuth()
-    if (loading) return <div className="p-10 text-center">Loading...</div>
+    if (loading) return <LoadingScreen />
     if (!user) return <Navigate to="/login" />
     const isAdmin = user.roles?.includes('ROLE_ADMIN')
     return isAdmin ? <Outlet /> : <Navigate to="/" />
@@ -66,7 +76,7 @@ function AdminRoute() {
 
 function ModeratorRoute() {
     const { user, loading } = useAuth()
-    if (loading) return <div className="p-10 text-center">Loading...</div>
+    if (loading) return <LoadingScreen />
     if (!user) return <Navigate to="/login" />
     const isAllowed = user.roles?.includes('ROLE_MODERATOR') || user.roles?.includes('ROLE_ADMIN')
     return isAllowed ? <Outlet /> : <Navigate to="/" />
@@ -77,19 +87,18 @@ function Layout() {
     const isLab = location.pathname.startsWith('/lab')
 
     return (
-        <div className="min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-1 pt-16">
-                <ErrorBoundary>
+        <ErrorBoundary>
+            <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <main className="flex-1 pt-16">
                     <Suspense fallback={<div className="p-10 text-center flex items-center justify-center min-h-[50vh]"><i className='bx bx-loader-alt bx-spin text-3xl text-accent'></i></div>}>
                         <Outlet />
                     </Suspense>
-                </ErrorBoundary>
-            </main>
-            <Footer />
-            {/* <AIChatWidget key={`ai-chat-${isLab ? 'lab' : 'web'}`} /> */}
-            <SupportChatWidget key={`support-chat-${isLab ? 'lab' : 'web'}`} />
-        </div>
+                </main>
+                <Footer />
+                <SupportChatWidget key={`support-chat-${isLab ? 'lab' : 'web'}`} />
+            </div>
+        </ErrorBoundary>
     )
 }
 
