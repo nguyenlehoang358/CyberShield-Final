@@ -7,21 +7,15 @@ const AuthContext = createContext()
 const currentHost = window.location.hostname
 
 // Logic xác định API URL an toàn
-let apiBaseURL = ""
-try {
-    // 1. Ưu tiên biến môi trường (Vercel Production)
-    apiBaseURL = import.meta.env.VITE_API_BASE_URL || ""
-} catch (e) {
-    console.error("Lỗi nạp biến môi trường:", e)
-}
+const apiBaseFromEnv = import.meta.env.VITE_API_BASE_URL || ""
+let apiBaseURL = apiBaseFromEnv
 
 if (!apiBaseURL) {
-    // 2. Logic cho Localhost / LAN / Ngrok
+    // Fallback cho môi trường localhost/LAN mà không cần cấu hình .env (Dành cho Dev tiện lợi)
     if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
         apiBaseURL = '/api'
-    } else if (currentHost.includes('ngrok-free.app')) {
-        apiBaseURL = import.meta.env.VITE_NGROK_BACKEND_URL || ""
     } else {
+        // Mặc định cho LAN IP hoặc tunnel
         apiBaseURL = `https://${currentHost}:8443/api`
     }
 }

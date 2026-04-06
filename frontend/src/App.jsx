@@ -45,16 +45,8 @@ const JWTLab = lazy(() => import('./pages/Lab/JWTLab'))
 // Phase 4 — Ecosystem
 const BlogList = lazy(() => import('./pages/Blog/BlogList'))
 
-// Hãy dùng cách lấy IP động:
-const currentIP = window.location.hostname;
-const baseURL = `https://${currentIP}:8443/api`;
-
-const axiosClient = axios.create({
-    baseURL: baseURL,
-    // các cấu hình khác của bạn (headers, credentials...) giữ nguyên
-});
-
-// const BlogPost      = lazy(() => import('./pages/Blog/BlogPost')) // Sẽ thêm sau khi tạo file chi tiết
+// Removed redundant axios client and dynamic IP guessing logic to prevent connection timeouts and UI crashes.
+// All API communication is now handle correctly via AuthContext.
 const SecurityScanner = lazy(() => import('./pages/Tools/SecurityScanner'))
 import CTFHub from './pages/CTF/CTFHub'
 import { Toaster } from 'sonner'

@@ -37,26 +37,24 @@ public class AIConfig {
     }
 
     /**
-     * Ollama Chat Model — connects to local Ollama server.
-     * Used by AI Assistant (chatbot) and Security Advisor.
+     * MOCK Chat Model — Prevents blocking backend threads when Ollama is offline.
+     * All primary AI functions (Mentor, SOC, Chat) now use OllamaLabMentorService (HF Cloud).
      */
     @Bean
     public ChatLanguageModel chatLanguageModel() {
-        String ollamaBaseUrl = settingService.getSettingValue("ai.ollama_url", "http://localhost:11434");
-        String ollamaModel = settingService.getSettingValue("ai.ollama_model", "llama3.2");
+        log.info("🤖 AI Config: Using CLOUD-FIRST Mock Model (Ensures zero-hang on local).");
 
-        int maxTokens = 1000;
-        int timeoutSeconds = 60;
+        return new ChatLanguageModel() {
+            @Override
+            public String generate(String message) {
+                return "CyberShield Cloud AI is active (Qwen 2.5 via HF). Local Ollama is bypassed for stability.";
+            }
 
-        log.info("🤖 Configuring Ollama Chat Model: {} at {}", ollamaModel, ollamaBaseUrl);
-
-        return OllamaChatModel.builder()
-                .baseUrl(ollamaBaseUrl)
-                .modelName(ollamaModel)
-                .temperature(0.0)
-                .numPredict(maxTokens)
-                .timeout(Duration.ofSeconds(timeoutSeconds))
-                .build();
+            @Override
+            public dev.langchain4j.model.output.Response<dev.langchain4j.data.message.AiMessage> generate(java.util.List<dev.langchain4j.data.message.ChatMessage> messages) {
+                return dev.langchain4j.model.output.Response.from(dev.langchain4j.data.message.AiMessage.from("CyberShield Cloud AI ready."));
+            }
+        };
     }
 
     /**

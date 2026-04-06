@@ -31,8 +31,8 @@ export default defineConfig(({ mode }) => {
         '.ngrok-free.dev'
       ],
       hmr: {
-        // Chỉ ép port 443 khi đang chạy qua tunnel (ngrok/pinggy) có trong env
-        clientPort: env.VITE_NGROK_BACKEND_URL ? 443 : undefined
+        // Removed ngrok forced 443 port to prevent UI freeze on tunnel death
+        clientPort: undefined
       },
       host: true,
     }
