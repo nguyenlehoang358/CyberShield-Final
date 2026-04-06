@@ -13,6 +13,7 @@ import SecurityAdvisor from '../components/SecurityAdvisor/SecurityAdvisor'
 import ErrorBoundary from '../components/ErrorBoundary/ErrorBoundary'
 import ERDiagram from '../components/Admin/ERDiagram'
 import AdminSettings from '../components/AdminSettings/AdminSettings'
+import PartnerSecurityMonitor from './Admin/PartnerSecurityMonitor'
 import '../styles/admin-dashboard.css'
 import '../styles/lab.css'
 
@@ -201,6 +202,13 @@ export default function AdminDashboard() {
                         <span>{t('admin_sol_mgr')}</span>
                     </button>
                     <button
+                        className={`admin-nav-item ${activeSection === 'partnerSecurity' ? 'active' : ''}`}
+                        onClick={() => handleSectionChange('partnerSecurity')}
+                    >
+                        <i className='bx bx-broadcast'></i>
+                        <span>{lang === 'vi' ? 'CyberShield SOC (Partners)' : 'Partner Defense'}</span>
+                    </button>
+                    <button
                         className={`admin-nav-item ${activeSection === 'security' ? 'active' : ''}`}
                         onClick={() => handleSectionChange('security')}
                     >
@@ -239,6 +247,7 @@ export default function AdminDashboard() {
                             {activeSection === 'blogs' && (lang === 'vi' ? 'Quản lý Tin tức' : 'Blog Management')}
                             {activeSection === 'solutions' && t('admin_sol_mgr')}
                             {activeSection === 'security' && t('admin_sys_sec')}
+                            {activeSection === 'partnerSecurity' && (lang === 'vi' ? 'Giám sát An ninh Mạng lưới SOC' : 'Network Security SOC Dashboard')}
                             {activeSection === 'advisor' && t('admin_ai_advisor')}
                             {activeSection === 'settings' && t('admin_sys_settings')}
                         </h1>
@@ -782,6 +791,11 @@ export default function AdminDashboard() {
                     {/* Section: Blogs */}
                     {activeSection === 'blogs' && (
                         <BlogManager />
+                    )}
+
+                    {/* Section: Partner Security (SOC) */}
+                    {activeSection === 'partnerSecurity' && (
+                        <PartnerSecurityMonitor />
                     )}
 
                     {/* Section: Security */}
