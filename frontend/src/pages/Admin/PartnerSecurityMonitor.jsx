@@ -23,7 +23,20 @@ export default function PartnerSecurityMonitor() {
     const loadAlerts = async () => {
         try {
             const res = await api.get('/v1/external/alerts');
-            setAlerts(res.data || []);
+            const newAlerts = res.data || [];
+            
+            // Nếu có cảnh báo mới hơn so với dữ liệu cũ, bắn Toast thông báo ngay!
+            if (alerts.length > 0 && newAlerts.length > alerts.length) {
+                const latest = newAlerts[0];
+                toast.error(`🚀 CẢNH BÁO SOC: Phát hiện cuộc tấn công ${latest.attackType} từ trang web đối tác!`, {
+                    description: `Mã độc: ${latest.payload.substring(0, 30)}...`,
+                    duration: 5000,
+                    style: { background: '#7f1d1d', color: '#fff', border: '1px solid #ef4444' }
+                });
+                // Bạn có thể thêm lệnh phát âm thanh cảnh báo tại đây nếu muốn
+            }
+            
+            setAlerts(newAlerts);
         } catch (err) {
             console.error('Failed to load partner alerts', err);
         } finally {
@@ -37,31 +50,31 @@ export default function PartnerSecurityMonitor() {
     };
 
     return (
-        <div className="partner-security-monitor">
+        <div className="partner-security-monitor" style={{ width: '100%', minHeight: '80vh' }}>
             <div className="admin-table-header" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                    <h2 style={{ color: 'var(--text-primary)', margin: 0 }}>
-                        {lang === 'vi' ? 'Giám sát An ninh Mạng lưới (SOC)' : 'Network Security Monitoring (SOC)'}
+                    <h2 style={{ color: 'var(--text-primary)', margin: 0, fontSize: '1.8rem', fontWeight: '800' }}>
+                        {lang === 'vi' ? '📍 Trung tâm Điều hành An ninh Mạng lưới (SOC)' : 'Network Security SOC Central'}
                     </h2>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                        {lang === 'vi' ? 'Theo dõi các cuộc tấn công thời gian thực từ website đối tác.' : 'Real-time monitoring of security threats from external partner sites.'}
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginTop: '0.5rem' }}>
+                        {lang === 'vi' ? 'Giám sát và ngăn chặn các cuộc tấn công xuyên biên giới đến hệ thống đối tác.' : 'Monitoring and neutralizing cross-border attacks on partner systems.'}
                     </p>
                 </div>
-                <div className="active-badge" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.8rem', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
-                   ● {lang === 'vi' ? 'Đang bảo vệ 24/7' : '24/7 Protection Active'}
+                <div className="active-badge" style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '0.7rem 1.2rem', borderRadius: '30px', fontSize: '0.9rem', fontWeight: 'bold', border: '1px solid rgba(34, 197, 94, 0.2)', boxShadow: '0 0 15px rgba(34, 197, 94, 0.2)' }}>
+                   ● {lang === 'vi' ? 'Hệ thống Đang bảo vệ 24/7' : '24/7 Shield Active'}
                 </div>
             </div>
 
-            <div className="admin-table-wrapper" style={{ animation: 'fadeIn 0.5s ease-out' }}>
-                <div className="admin-table-scroll">
-                    <table className="admin-data-table">
-                        <thead>
+            <div className="admin-table-wrapper" style={{ width: '100%', animation: 'fadeIn 0.5s ease-out', border: '1px solid var(--border-color)', borderRadius: '16px', overflow: 'hidden', background: 'var(--bg-card)' }}>
+                <div className="admin-table-scroll" style={{ maxHeight: '70vh' }}>
+                    <table className="admin-data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        <thead style={{ background: 'rgba(255,255,255,0.03)' }}>
                             <tr>
-                                <th>{lang === 'vi' ? 'Thời gian' : 'Time'}</th>
-                                <th>{lang === 'vi' ? 'Loại tấn công' : 'Attack Type'}</th>
-                                <th>{lang === 'vi' ? 'Payload (Mã độc)' : 'Payload'}</th>
-                                <th>{lang === 'vi' ? 'IP Kẻ tấn công' : 'Attacker IP'}</th>
-                                <th>{lang === 'vi' ? 'Đường dẫn mục tiêu' : 'Target Path'}</th>
+                                <th style={{ padding: '1.2rem', textAlign: 'left' }}>{lang === 'vi' ? 'Thời gian' : 'Time'}</th>
+                                <th style={{ padding: '1.2rem', textAlign: 'left' }}>{lang === 'vi' ? 'Loại tấn công' : 'Attack Type'}</th>
+                                <th style={{ padding: '1.2rem', textAlign: 'left' }}>{lang === 'vi' ? 'Dữ liệu độc hại (Payload)' : 'Payload'}</th>
+                                <th style={{ padding: '1.2rem', textAlign: 'left' }}>{lang === 'vi' ? 'Nguồn (IP)' : 'Source IP'}</th>
+                                <th style={{ padding: '1.2rem', textAlign: 'left' }}>{lang === 'vi' ? 'Mục tiêu' : 'Target'}</th>
                             </tr>
                         </thead>
                         <tbody>

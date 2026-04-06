@@ -1,6 +1,6 @@
 /*
- * 🛡️ CyberShield Shield Agent v1.1 [ULTRA MONITOR]
- * [SOC AS A SERVICE - ĐƠN VỊ BẢO VỆ WEBSITE KHÁCH HÀNG]
+ * 🛡️ CyberShield Shield Agent v1.2 [PROACTIVE DEFENSE]
+ * [SOC AS A SERVICE - HỆ THỐNG PHÒNG THỦ CHỦ ĐỘNG]
  */
 (function() {
     const scriptTag = document.currentScript;
@@ -9,56 +9,66 @@
 
     if (!apiKey) return;
 
-    console.log("%c[CyberShield]%c Shield Agent v1.1 is active.", "color: #00ff00; font-weight: bold", "color: gray");
+    console.log("%c[CyberShield]%c Proactive Defense v1.2 is active.", "color: #00ff00; font-weight: bold", "color: gray");
 
     const THREAT_PATTERNS = {
         XSS: /<script|onerror|alert\(|onclick|javascript:|<iframe>/i,
         SQL_INJECTION: /' OR 1=1|--|DROP TABLE|INSERT INTO|SELECT.*FROM|UNION SELECT/i
     };
 
+    /**
+     * HÀM BÁO CÁO SOC
+     */
     async function reportAttack(type, payload) {
-        console.log(`[CyberShield] Investigating suspicious activity...`);
         try {
             await fetch(`${CYBERSHIELD_ENDPOINT}?apiKey=${apiKey}`, {
                 method: "POST",
-                mode: "cors", // Đảm bảo chạy xuyên tên miền
+                mode: "cors",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     attackType: type,
                     payload: payload,
-                    attackerIp: "CLIENT_SIDE_AGENT",
+                    attackerIp: "SOC_AGENT_SHIELD",
                     targetPath: window.location.href
                 })
             });
-            console.warn(`[CyberShield] Threat ${type} reported!`);
-        } catch (err) {
-            console.error("[CyberShield] SOC Communication failed:", err);
-        }
+        } catch (err) {}
     }
 
-    // 1. CHỦ ĐỘNG QUÉT: Quét ngay khi người dùng rời khỏi ô nhập liệu (onBlur)
-    document.addEventListener("focusout", function(event) {
-        if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA") {
-            const value = event.target.value;
-            if (THREAT_PATTERNS.XSS.test(value)) reportAttack("XSS_DETECTION", `Input [${event.target.name}]: ${value}`);
-            if (THREAT_PATTERNS.SQL_INJECTION.test(value)) reportAttack("SQL_INJECTION", `Input [${event.target.name}]: ${value}`);
-        }
-    });
+    /**
+     * HÀM CHẶN ĐỨNG TẤN CÔNG (THE BLOCKER)
+     */
+    function blockAction(event, type, reason) {
+        event.preventDefault(); // CHẶN ĐỨNG HÀNH ĐỘNG GỬI DỮ LIỆU ĐỘC HẠI
+        event.stopPropagation();
+        
+        // Hiển thị cảnh báo chuyên nghiệp
+        alert(`🛡️ [CyberShield Security]\n\nHành động của bạn đã bị chặn vì phát hiện dấu hiệu tấn công: ${type}\nChi tiết: ${reason}\n\nThông tin này đã được gửi về trung tâm SOC.`);
+        
+        console.error(`%c[Blocked]%c CyberShield neutralized a ${type} attempt.`, "color: red; font-weight: bold", "color: gray");
+    }
 
-    // 2. QUÉT KHI CLICK: Quét khi người dùng nhấn bất kỳ nút nào (Dành cho Form dùng AJAX)
-    document.addEventListener("click", function(event) {
-        if (event.target.tagName === "BUTTON" || (event.target.tagName === "INPUT" && event.target.type === "submit")) {
-            const inputs = document.querySelectorAll("input");
-            inputs.forEach(input => {
-                const value = input.value;
-                if (THREAT_PATTERNS.XSS.test(value)) reportAttack("XSS_DETECTION_ON_CLICK", value);
-                if (THREAT_PATTERNS.SQL_INJECTION.test(value)) reportAttack("SQL_INJECTION_ON_CLICK", value);
-            });
-        }
-    });
+    // 1. QUÉT VÀ CHẶN KHI SUBMIT (CHỐNG TẤN CÔNG FORM)
+    document.addEventListener("submit", function(event) {
+        const inputs = event.target.querySelectorAll("input, textarea");
+        let isHostile = false;
 
-    // 3. QUÉT URL (URL Injection)
+        inputs.forEach(input => {
+            const val = input.value;
+            if (THREAT_PATTERNS.XSS.test(val)) {
+                reportAttack("XSS_PREVENTED", val);
+                blockAction(event, "XSS Attack", "Mã độc Script được phát hiện.");
+                isHostile = true;
+            } else if (THREAT_PATTERNS.SQL_INJECTION.test(val)) {
+                reportAttack("SQL_INJECTION_PREVENTED", val);
+                blockAction(event, "SQL Injection", "Hành vi tiêm nhiễm Database.");
+                isHostile = true;
+            }
+        });
+    }, true); // Use capture phase to intercept early
+
+    // 2. QUÉT VÀ CHẶN TRÊN URL (URL ATTACK)
     if (THREAT_PATTERNS.XSS.test(window.location.search) || THREAT_PATTERNS.SQL_INJECTION.test(window.location.search)) {
-        reportAttack("URL_INJECTION", window.location.search);
+        reportAttack("URL_ATTACK_RECORDS", window.location.search);
     }
 })();
