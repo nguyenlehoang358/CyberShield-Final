@@ -27,7 +27,7 @@ export default function Contact() {
 
         // API call
         try {
-            await api.post('/contact', formData);
+            await api.post('/v1/contacts', formData);
             setStatus('success');
             setFormData({ name: '', email: '', subject: '', message: '' });
         } catch (error) {

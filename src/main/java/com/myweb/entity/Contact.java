@@ -25,6 +25,9 @@ public class Contact {
     @Column(columnDefinition = "TEXT")
     private String message;
 
+    @Column(length = 200)
+    private String subject;
+
     @Column(name = "created_at")
     private Instant createdAt = Instant.now();
 
@@ -40,6 +43,8 @@ public class Contact {
     public void setEmail(String email) { this.email = email; }
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
+    public String getSubject() { return subject; }
+    public void setSubject(String subject) { this.subject = subject; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
     public Boolean getIsRead() { return isRead != null ? isRead : false; }
