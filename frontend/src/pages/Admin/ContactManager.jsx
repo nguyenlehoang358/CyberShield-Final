@@ -14,7 +14,7 @@ export default function ContactManager() {
     const loadContacts = async () => {
         setLoading(true)
         try {
-            const res = await api.get('/contacts')
+            const res = await api.get('/v1/contacts')
             // Sắp xếp ID lớn nhất (mới nhất) lên trên cùng
             const sortedData = (res.data || []).sort((a, b) => b.id - a.id)
             setContacts(sortedData)
@@ -26,7 +26,7 @@ export default function ContactManager() {
 
     const handleMarkAsRead = async (id) => {
         try {
-            const res = await api.put(`/contacts/${id}/read`)
+            const res = await api.put(`/v1/contacts/${id}/read`)
             setContacts(contacts.map(c => c.id === id ? res.data : c))
         } catch (err) {
             alert('Lỗi: ' + (err.response?.data?.message || err.message))
@@ -36,7 +36,7 @@ export default function ContactManager() {
     const handleDelete = async (id) => {
         if (!window.confirm('Xác nhận xóa liên hệ này?')) return
         try {
-            await api.delete(`/contacts/${id}`)
+            await api.delete(`/v1/contacts/${id}`)
             setContacts(contacts.filter(c => c.id !== id))
         } catch (err) {
             alert('Lỗi khi xóa: ' + err.message)
