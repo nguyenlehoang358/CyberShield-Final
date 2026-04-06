@@ -1,6 +1,5 @@
 package com.myweb.config;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,32 +8,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.myweb.service.SystemSettingService;
-
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.output.Response;
 
 /**
  * AI / LLM Configuration
  *
  * Configures:
- * - Ollama Chat Model (local LLM for AI Assistant + Security Advisor)
+ * - MOCK Chat Model (Cloud-first — all real AI calls go through OllamaLabMentorService → HF)
  * - MOCK Embedding Model (To save memory on Render Free)
  */
 @Configuration
 public class AIConfig {
 
     private static final Logger log = LoggerFactory.getLogger(AIConfig.class);
-
-    private final SystemSettingService settingService;
-
-    public AIConfig(SystemSettingService settingService) {
-        this.settingService = settingService;
-    }
 
     /**
      * MOCK Chat Model — Prevents blocking backend threads when Ollama is offline.

@@ -27,7 +27,6 @@ import Placeholder from './components/Placeholder'
 import LabHub from './pages/Lab/LabHub'
 import LabLayout from './pages/Lab/LabLayout'
 import LabSkeleton from './pages/Lab/LabSkeleton'
-import axios from 'axios';
 /* ─────────────────────────────────────────
    Lazy-loaded Lab Modules (Code Splitting)
    Each lab is 40-53KB — loading on-demand

@@ -158,9 +158,8 @@ export default function SupportChatWidget() {
     const messagesEndRef = useRef(null)
     const inputRef = useRef(null)
 
-    if (location.pathname.startsWith('/lab')) {
-        return null; // hide on lab pages
-    }
+    // Ẩn widget trên trang Lab (kiểm tra ở đây nhưng KHÔNG return trước hooks)
+    const isLabPage = location.pathname.startsWith('/lab')
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -240,6 +239,9 @@ export default function SupportChatWidget() {
     const copyToClipboard = (text) => {
         navigator.clipboard.writeText(text)
     }
+
+    // Guard: ẩn widget trên lab pages — phải đặt SAU tất cả hooks
+    if (isLabPage) return null
 
     return (
         <>
