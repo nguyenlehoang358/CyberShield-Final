@@ -15,25 +15,26 @@ export default function PartnerSecurityMonitor() {
 
     useEffect(() => {
         loadAlerts();
-        // Tự động làm mới dữ liệu mỗi 10 giây để demo hiệu ứng "Thời gian thực"
-        const interval = setInterval(loadAlerts, 10000);
+        // Tần suất quét cao hơn (5 giây) để demo hiệu ứng phản ứng nhanh (SOC Real-time)
+        const interval = setInterval(loadAlerts, 5000);
         return () => clearInterval(interval);
-    }, []);
+    }, [alerts.length]); // Theo dõi độ dài để logic so sánh chính xác
 
     const loadAlerts = async () => {
         try {
             const res = await api.get('/v1/external/alerts');
             const newAlerts = res.data || [];
             
-            // Nếu có cảnh báo mới hơn so với dữ liệu cũ, bắn Toast thông báo ngay!
-            if (alerts.length > 0 && newAlerts.length > alerts.length) {
-                const latest = newAlerts[0];
-                toast.error(`🚀 CẢNH BÁO SOC: Phát hiện cuộc tấn công ${latest.attackType} từ trang web đối tác!`, {
-                    description: `Mã độc: ${latest.payload.substring(0, 30)}...`,
-                    duration: 5000,
-                    style: { background: '#7f1d1d', color: '#fff', border: '1px solid #ef4444' }
-                });
-                // Bạn có thể thêm lệnh phát âm thanh cảnh báo tại đây nếu muốn
+            // LOGIC CẢNH BÁO MỚI: So sánh ID của bản ghi đầu tiên (Mới nhất)
+            if (alerts.length > 0 && newAlerts.length > 0) {
+                if (newAlerts[0].id !== alerts[0].id) {
+                    const latest = newAlerts[0];
+                    toast.error(`🚀 SOC ALERT: Phát hiện tấn công ${latest.attackType}!`, {
+                        description: `Vừa xảy ra tại: ${latest.targetPath.substring(0, 40)}...`,
+                        duration: 6000,
+                        style: { background: '#991b1b', color: '#fff', border: '1px solid #f87171', fontWeight: 'bold' }
+                    });
+                }
             }
             
             setAlerts(newAlerts);
@@ -46,7 +47,18 @@ export default function PartnerSecurityMonitor() {
 
     const formatDate = (iso) => {
         if (!iso) return '-';
-        return new Date(iso).toLocaleString(lang === 'vi' ? 'vi-VN' : 'en-US');
+        try {
+            // FIX LỖI GIỜ: Thêm 'Z' để trình duyệt hiểu đây là giờ UTC và tự đổi sang giờ VN (+7)
+            const dateStr = iso.includes('Z') ? iso : iso + 'Z';
+            return new Date(dateStr).toLocaleString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        } catch { return iso; }
     };
 
     return (

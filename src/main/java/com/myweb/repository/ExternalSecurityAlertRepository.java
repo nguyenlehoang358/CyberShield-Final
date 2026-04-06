@@ -2,17 +2,17 @@ package com.myweb.repository;
 
 import com.myweb.entity.ExternalSecurityAlert;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import java.util.List;
 
-/**
- * Repository lưu nhật ký tấn công từ mạng xã hội/web ngoài.
- * Dùng để hiển thị thống kê trên Dashboard SOC cho Admin quản trị.
- */
+@Repository
 public interface ExternalSecurityAlertRepository extends JpaRepository<ExternalSecurityAlert, Long> {
     
-    /** Tìm toàn bộ nhật ký tấn công của một website cụ thể (ClientId) */
-    List<ExternalSecurityAlert> findByClientIdOrderByTimestampDesc(Long clientId);
-    
-    /** Lấy danh sách nhật ký mới nhất trình diễn trên Dashboard Dashboard */
-    List<ExternalSecurityAlert> findTop50ByOrderByTimestampDesc();
+    // Tìm kiếm các cảnh báo của một client cụ thể
+    List<ExternalSecurityAlert> findByClientId(Long clientId);
+
+    // LẤY TẤT CẢ CẢNH BÁO - MỚI NHẤT LÊN ĐẦU (Dành cho SOC REALTIME)
+    @Query("SELECT a FROM ExternalSecurityAlert a ORDER BY a.timestamp DESC")
+    List<ExternalSecurityAlert> findAllOrderByTimestampDesc();
 }

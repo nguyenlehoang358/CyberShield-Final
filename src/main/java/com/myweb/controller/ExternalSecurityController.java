@@ -50,12 +50,12 @@ public class ExternalSecurityController {
     }
 
     /**
-     * API LẤY TOÀN BỘ CẢNH BÁO MỚI NHẤT (ADMIN CHỈ ĐỊNH)
-     * Dùng để phục vụ hiển thị trên Dashboard Dashboard.
+     * [SOC ADMIN ONLY] - Lấy danh sách tất cả cảnh báo từ xa (Mới nhất lên đầu)
      */
     @GetMapping("/alerts")
-    public ResponseEntity<List<ExternalSecurityAlert>> getGlobalExternalAlerts() {
-        return ResponseEntity.ok(alertRepository.findTop50ByOrderByTimestampDesc());
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<ExternalSecurityAlert> getAllAlerts() {
+        return alertRepository.findAllOrderByTimestampDesc();
     }
 
     /**
