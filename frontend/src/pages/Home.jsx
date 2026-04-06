@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useLanguage } from '../context/LanguageContext'
 import { useAuth } from '../context/AuthContext'
-import axios from 'axios'
 import '../styles/modal.css'
 import ParticleCanvas from '../components/ParticleCanvas'
 import FloatingShapes from '../components/FloatingShapes'
@@ -247,20 +246,9 @@ export default function Home() {
         let isMounted = true;
         const fetchSolutions = async () => {
             try {
-                const currentHost = window.location.hostname;
-                let apiPath = `https://${currentHost}:8443/api/public/solutions`;
-
-                if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-                    apiPath = '/api/public/solutions';
-                } else if (currentHost.includes('ngrok-free.app') || currentHost.includes('ngrok-free.dev')) {
-                    apiPath = import.meta.env.VITE_NGROK_BACKEND_URL ? `${import.meta.env.VITE_NGROK_BACKEND_URL}/public/solutions` : `https://api-${currentHost}/api/public/solutions`;
-                }
-                const res = await axios.get(apiPath, {
-                    headers: {
-                        'ngrok-skip-browser-warning': 'true',
-                        'bypass-tunnel-reminder': 'true'
-                    }
-                });
+                // Sử dụng instance 'api' đã được cấu hình sẵn base URL từ .env
+                const res = await api.get('/public/solutions');
+                
                 if (!isMounted) return;
                 
                 const parsedSolutions = res.data.map(s => {

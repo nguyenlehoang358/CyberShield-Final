@@ -20,11 +20,11 @@ public class EmailService {
     public void sendContactNotification(String customerName, String customerEmail, String subject, String message) {
         try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
-            // mailMessage.setFrom("CyberShield <no-reply@cybershield.com>");
-            mailMessage.setFrom("nguyenlehoang358@gmail.com");
-            // Hoặc
-            mailMessage.setFrom(customerEmail); // Để Admin thấy email khách hàng ngay tiêu đề
+            // Gmail SMTP yêu cầu From phải là email đã xác thực (nguyenlehoang358@gmail.com)
+            mailMessage.setFrom("CyberShield Admin <nguyenlehoang358@gmail.com>");
             mailMessage.setTo("nguyenlehoang358@gmail.com");
+            // Cho phép Admin nhấn Reply để phản hồi khách hàng ngay trong Gmail
+            mailMessage.setReplyTo(customerEmail);
             mailMessage.setSubject("🔔 Liên hệ mới từ CyberShield: " + (subject != null ? subject : "Yêu cầu chung"));
 
             String emailContent = String.format(
