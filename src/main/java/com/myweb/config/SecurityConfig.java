@@ -122,7 +122,14 @@ public class SecurityConfig {
                                                                 "/api/blog/**")
                                                 .permitAll()
                                                 .requestMatchers("/api/lab/**").permitAll()
-                                                .requestMatchers("/api/**").authenticated())
+                                                .requestMatchers("/api/v1/auth/**").permitAll()
+                                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/api/v1/external/**").permitAll()
+                                                .requestMatchers("/api/v1/solutions/**").permitAll()
+                                                .requestMatchers("/api/v1/blogs/**").permitAll()
+                                                .requestMatchers("/api/v1/contacts/**").permitAll()
+                                                .requestMatchers("/cybershield-shield.js").permitAll()
+                                                .anyRequest().authenticated())
 
                                 .oauth2Login(oauth2 -> oauth2
                                                 .authorizationEndpoint(authorization -> authorization
@@ -171,14 +178,13 @@ public class SecurityConfig {
                 CorsConfiguration config = new CorsConfiguration();
 
                 // FIX: Danh sách origin rõ ràng, không trailing slash lẫn lộn
+                // FIX: Cho phép báo cáo từ mọi cổng Local (phục vụ Demo) và các domain chính thức
                 config.setAllowedOriginPatterns(Arrays.asList(
-                                "http://localhost:5173",
-                                "http://localhost:3000",
+                                "http://localhost:*",
+                                "http://127.0.0.1:*",
                                 "http://192.168.*.*",
-                                "http://127.0.0.1:5173",
                                 "https://*.ngrok-free.app",
                                 "https://*.ngrok-free.dev",
-                                "https://tyler-nonexemplary-attractionally.ngrok-free.dev",
                                 "https://cybershield-prod.vercel.app",
                                 "https://cybershield-final-chi.vercel.app"));
 
