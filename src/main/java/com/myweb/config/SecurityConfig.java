@@ -115,6 +115,9 @@ public class SecurityConfig {
                                                 .permitAll()
                                                 .requestMatchers("/api/ai/chat", "/api/ai/status", "/api/ai/health")
                                                 .permitAll()
+                                                .requestMatchers(org.springframework.http.HttpMethod.POST, 
+                                                                "/api/v1/external/alert")
+                                                .permitAll()
                                                 .requestMatchers(org.springframework.http.HttpMethod.GET,
                                                                 "/api/blog/**")
                                                 .permitAll()
