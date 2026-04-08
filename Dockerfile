@@ -11,5 +11,5 @@ RUN addgroup --system appgroup && adduser --system --group appuser
 WORKDIR /app
 COPY --from=build --chown=appuser:appgroup /app/target/*.jar app.jar
 USER appuser
-EXPOSE 8443
+EXPOSE 10000
 ENTRYPOINT ["java", "-jar", "app.jar"]
