@@ -23,8 +23,7 @@ public class BlogCrawlerService {
     @Autowired
     private BlogRepository blogRepository;
 
-    @PostConstruct
-    @Scheduled(fixedDelay = 3600000) // 1 hour
+    @Scheduled(fixedDelay = 3600000, initialDelay = 30000) // Chờ server lên 30s rồi mới bắt đầu cào data
     public void fetchSecurityNews() {
         logger.info("Bắt đầu cào dữ liệu từ The Hacker News...");
         try {
